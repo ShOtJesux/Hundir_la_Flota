@@ -77,81 +77,134 @@ void color(int k){
 }
 
 void jugarIA(){
-    char J1[10][10], J2[10][10], i, j;
+    int i, j, sel=0, aux[5]={0,0,0,0,0};
+    char selchar[2], res[3], J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
 
     for (i=0;i<10;i++){
         for(j=0;j<10;j++){
             J1[i][j]=' ';
             J2[i][j]=' ';
+            J1B[i][j]=' ';
+            J2B[i][j]=' ';
         }
     }
-    J1[5][5]='.';
+    printf("%c",J2[1][1]);
+    printf("%c",J2B[1][1]);
+    printf("%c",J1B[1][1]);
 
     system("cls");
-    printf("________________________________________\n");
-    for(i=0;i<10;i++){
-        for(j=0;j<10;j++){
+
+    printf("FASE 1: ");
+    Sleep(800);
+    printf("COLOCA TUS BARCOS\n\n");
+    Sleep(1000);
+
+    do{
+
+        printf("     |     |     |     |     |     |     |     |     |     |     |\n");
+        printf("     |  A  |  B  |  C  |  D  |  E  |  F  |  G  |  H  |  I  |  J  |\n");
+        printf("_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|\n");
+        for(i=0;i<10;i++){
+            printf("     ");
+            for(j=0;j<10;j++){
+                printf("|");
+                if(J1[i][j]=='.'){
+                    color(AZUL_AZUL);
+                }
+                printf("     ");
+                color(BLANCO);
+            }
+            printf("|\n");
+            printf("  %i  ",i);
             printf("|");
-            if(J1[i][j]=='.'){
-                color(AZUL_AZUL);
+            for(j=0;j<10;j++){
+                if(J1[i][j]=='X'){
+                    color(ROJO);
+                }
+                if(J1[i][j]=='.'){
+                    color(AZUL_AZUL);
+                }
+                printf("  %c  ", J1[i][j]);
+                color(BLANCO);
+                printf("|");
             }
-            printf("   ");
+            printf("\n");
+            printf("_____");
+            for(j=0;j<10;j++){
+                color(BLANCO);
+                printf("|");
+                if(J1[i][j]=='.'){
+                    color(AZUL_BLANCO);
+                }
+                printf("_____");
+            }
             color(BLANCO);
-        }
-        printf("|");
-        printf("\n");
-        printf("|");
-        for(j=0;j<10;j++){
-            if(J1[i][j]=='X'){
-                color(ROJO);
-            }
-            if(J1[i][j]=='.'){
-                color(AZUL_AZUL);
-            }
-            printf(" %c ", J1[i][j]);
-            color(BLANCO);
-            printf("|");
-        }
-        printf("\n");
-        for(j=0;j<10;j++){
-            color(BLANCO);
-            printf("|");
-            if(J1[i][j]=='.'){
-                color(AZUL_BLANCO);
-            }
-            printf("___");
+            printf("|\n");
         }
         color(BLANCO);
-        printf("|");
-        printf("\n");
-        /*printf("|");
-        for(j=0;j<10;j++){
-            if(MU[i][j]=='X'){
-                color(ROJO);
-            }
-            if(MU[i][j]=='.'){
-                color(AZUL_AZUL);
-            }
-            printf("%c ", MU[i][j]);
-            color(BLANCO);
-            printf("|");
-        }
-        printf("\n");
-        for(j=0;j<10;j++){
-            color(BLANCO);
-            printf("|");
-            if(MU[i][j]=='.'){
-                color(AZUL_BLANCO);
-            }
-            printf("__");
-        }
-        color(BLANCO);
-        printf("|");
-        printf("\n");*/
-    }
-    color(BLANCO);
+        printf("\n\n");
 
-    printf("\n\n");
+        i=2;
+        j=1;
 
-    sleep(60);
+        printf("Elige un barco para colocar:\n");
+        if(aux[0]!=1){
+            if(sel==i-1){
+                aux[0]=1;
+            }else{
+                printf("    %i. Portaaviones:     5 casillas\n",j);
+                j++;
+            }
+            i++;
+        }
+        if(aux[1]!=1){
+            if(sel==i-1){
+                aux[1]=1;
+            }else{
+                printf("    %i. Acorazado:        4 casillas\n",j);
+                j++;
+            }
+            i++;
+        }
+        if(aux[2]!=1){
+            if(sel==i-1){
+                aux[2]=1;
+            }else{
+                printf("    %i. Submarino:        3 casillas\n",j);
+                j++;
+            }
+            i++;
+        }
+        if(aux[3]!=1){
+            if(sel==i-1){
+                aux[3]=1;
+            }else{
+                printf("    %i. Destructor:       3 casillas\n",j);
+                j++;
+            }
+            i++;
+        }
+        if(aux[4]!=1){
+            if(sel==i-1){
+                aux[4]=1;
+            }else{
+                printf("    %i. Barco patrulla:   2 casillas\n",j);
+                j++;
+            }
+            i++;
+        }
+        //printf("%i,%i,%i,%i,%i\n",aux[0],aux[1],aux[2],aux[3],aux[4]);
+        if(j!=1){
+            fflush(stdin);
+            fgets(selchar,sizeof(selchar),stdin);
+            sel=atoi(selchar);
+            system("cls");
+            if(sel<=0 || sel>=j){
+                printf("Opcion incorrecta\n\n");
+                sel=0;
+                Sleep(500);
+            }
+        }
+    }while(j!=2 || sel<=0);
+
 }
