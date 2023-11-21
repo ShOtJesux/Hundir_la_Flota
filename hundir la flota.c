@@ -150,6 +150,7 @@ void jugarIA(){
                 printf("\nIntroduce los extremos de la ubicacion de tu barco formato B2-E2\n");
                 fflush(stdin);
                 fgets(res,6,stdin);
+                system("cls");
                 if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
                     auxchar[0]=res[1];
                     res[1]=res[0];
@@ -209,8 +210,15 @@ void jugarIA(){
                                     break;
                             }
                             for(j=i;j<resta1+i;j++){
-                                J1[(res[1])-'0'][j]='O';
-                            }         
+                                if(J1[(res[1]-'0')-1][j]=='O' || J1[(res[1]-'0')+1][j]=='O' || J1[res[1]-'0'][j-1]=='O' || J1[res[1]-'0'][j+1]=='O'){
+                                    sel=-1;
+                                }
+                            }
+                            if(sel!=-1){
+                               for(j=i;j<resta1+i;j++){
+                                    J1[res[1]-'0'][j]='O';
+                                }  
+                            }       
                         }else{
                             switch(res[1]){
                                 case '0':
@@ -244,63 +252,68 @@ void jugarIA(){
                                     i=9;
                                     break;
                             }
-                            for(j=i;j<resta2+i;j++){
-                                J1[j][toupper(res[0])-65]='O';
+                            for(j=i;j<resta1+i;j++){
+                                if(J1[j-1][toupper(res[0])-65]=='O' || J1[j+1][toupper(res[0])-65]=='O' || J1[j][(toupper(res[0])-65)-1]=='O' || J1[j][(toupper(res[0])-65)+1]=='O'){
+                                    sel=-1;
+                                }
                             }
-                        }
-                        system("cls");
-                        printf("Barco colocado\n\n");
-                        if(barcos_colocados!=4){
-                            v[sel-1]=v[4-barcos_colocados];
-                            v[4-barcos_colocados]=-1;
-                            v=(int *)realloc(v,(4-barcos_colocados) * sizeof(int));
-                            ordenar(v,4-barcos_colocados);
-                            for(i=0;i<=4-barcos_colocados;i++){
-                                switch(v[i]){
-                                    case 0:
-                                        v_tamaño[i]=5;
-                                        break;
-                                    case 1:
-                                        v_tamaño[i]=4;
-                                        break;
-                                    case 2:
-                                        v_tamaño[i]=3;
-                                        break;
-                                    case 3:
-                                        v_tamaño[i]=3;
-                                        break;
-                                    case 4:
-                                        v_tamaño[i]=2;
-                                        break;
+                            if(sel!=-1){
+                                for(j=i;j<resta2+i;j++){
+                                    J1[j][toupper(res[0])-65]='O';
                                 }
                             }
                         }
-
-                        barcos_colocados++;
-                        Sleep(500);
-                    }else{
-                        system("cls");
-                        if((resta1==1 && resta2<v_tamaño[sel-1]) || (resta1<v_tamaño[sel-1] && resta2==1)){
-                            printf("Este barco requiere mas casillas\n\n");
-                        }else if((resta1==1 && resta2>v_tamaño[sel-1]) || (resta1>v_tamaño[sel-1] && resta2==1)){
-                            printf("Este barco requiere menos casillas\n\n");
+                        if(sel!=-1){
+                            printf("Barco colocado\n\n");
+                            if(barcos_colocados!=4){
+                                v[sel-1]=v[4-barcos_colocados];
+                                v[4-barcos_colocados]=-1;
+                                v=(int *)realloc(v,(4-barcos_colocados) * sizeof(int));
+                                ordenar(v,4-barcos_colocados);
+                                for(i=0;i<=4-barcos_colocados;i++){
+                                    switch(v[i]){
+                                        case 0:
+                                            v_tamaño[i]=5;
+                                            break;
+                                        case 1:
+                                            v_tamaño[i]=4;
+                                            break;
+                                        case 2:
+                                            v_tamaño[i]=3;
+                                            break;
+                                        case 3:
+                                            v_tamaño[i]=3;
+                                            break;
+                                        case 4:
+                                            v_tamaño[i]=2;
+                                            break;
+                                    }
+                                }
+                            }
+                            barcos_colocados++;
+                            //Sleep(500);
                         }else{
-                            printf("No se pueden colocar barcos en diagonal\n\n");
+                            printf("Debe de haber al menos una casilla de distancia entre barco y barco\n\n");
                         }
-                        Sleep(500);
+                        
+                    }else{
+                        if(resta1!=1 && resta2!=1){
+                            printf("No se pueden colocar barcos en diagonal\n\n");
+                        }else if((resta1==1 && resta2<v_tamaño[sel-1]) || (resta1<v_tamaño[sel-1] && resta2==1)){
+                            printf("Este barco requiere mas casillas\n\n");
+                        }else{
+                            printf("Este barco requiere menos casillas\n\n");
+                        }
+                        //Sleep(500);
                     }
                 }else{
-                    system("cls");
                     printf("Formato incorrecto\n\n");
-                    Sleep(500);
+                    //Sleep(500);
                 }
-
-
+                Sleep(500);
             }while(sel==0);
-
         }
     }while(barcos_colocados!=5);
-
 }
 
 void print_matriz(char M1[10][10], char M2[10][10], int selector){
