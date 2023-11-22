@@ -14,9 +14,11 @@
 #define AZUL_BLANCO 159
 
 void color(int);
-void jugarIA();
-void print_matriz(char [10][10], char [10][10], int);
+void jugarIA(int);
+void print_matriz(char [10][10], int);
 void ordenar(int *,int);
+void colocar_barcos(char [10][10]);
+int atacar(char [10][10], char [10][10]);
 
 int main(){
     char res;
@@ -53,10 +55,10 @@ int main(){
 
         switch(res){
             case '1':
-                jugarIA();
+                jugarIA(0);
                 break;
             case '2':
-
+                jugarIA(1);
                 break;
             case '3':
 
@@ -81,11 +83,9 @@ void color(int k){
     SetConsoleTextAttribute(Consola,k);
 }
 
-void jugarIA(){
-    int i, j, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, selector=0, barcos_colocados=0;
-    char auxchar[2], res[6], J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
-
-    v=(int *)malloc(5 * sizeof(int));
+void jugarIA(int estado){
+    int i, j, finalizar;
+    char J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
 
     for (i=0;i<10;i++){
         for(j=0;j<10;j++){
@@ -95,10 +95,7 @@ void jugarIA(){
             J2B[i][j]=' ';
         }
     }
-    for(i=0;i<5;i++){
-        v[i]=i;
-    }
-    printf("%c",J2[1][1]);
+    printf("%c",J1[1][1]);
     printf("%c",J2B[1][1]);
     printf("%c",J1B[1][1]);
 
@@ -110,8 +107,119 @@ void jugarIA(){
     Sleep(1000);
 
     do{
+        
+        if(estado==1 || estado==2){
+            printf("TURNO DEL JUGADOR %i\n\n",estado);
+            Sleep(800);
+        }
+        
+        if(estado!=2){
+            colocar_barcos(J1B);
+        }else{
+            colocar_barcos(J2B);
+        }
+        estado++;
 
-        print_matriz(J1,J2,selector);
+    }while(estado==2);
+
+    estado=1;
+
+    printf("FASE 2: ");
+    Sleep(800);
+    printf("ATACA AL ENEMIGO\n\n");
+    Sleep(1000);
+
+    do{
+        printf("TURNO DEL JUGADOR %i\n\n",estado);///////////
+        Sleep(800);
+
+        if(estado==1){
+            finalizar=atacar(J2,J2B);
+            estado++;
+        }else{
+            finalizar=atacar(J1,J1B);
+            estado--;
+        }
+
+    }while(finalizar==0);
+}
+
+void print_matriz(char M[10][10], int selector){
+    int i,j;
+
+    if(selector){
+
+    }
+    printf("     |     |     |     |     |     |     |     |     |     |     |\n");
+    printf("     |  A  |  B  |  C  |  D  |  E  |  F  |  G  |  H  |  I  |  J  |\n");
+    printf("_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|\n");
+    for(i=0;i<10;i++){
+        printf("     ");
+        for(j=0;j<10;j++){
+            printf("|");
+            if(M[i][j]=='.'){
+                color(AZUL_AZUL);
+            }
+            printf("     ");
+            color(BLANCO);
+        }
+        printf("|\n");
+        printf("  %i  ",i);
+        printf("|");
+        for(j=0;j<10;j++){
+            if(M[i][j]=='X'){
+                color(ROJO);
+            }
+            if(M[i][j]=='.'){
+                color(AZUL_AZUL);
+            }
+            printf("  %c  ",M[i][j]);
+            color(BLANCO);
+            printf("|");
+        }
+        printf("\n");
+        printf("_____");
+        for(j=0;j<10;j++){
+            color(BLANCO);
+            printf("|");
+            if(M[i][j]=='.'){
+                color(AZUL_BLANCO);
+            }
+            printf("_____");
+        }
+        color(BLANCO);
+        printf("|\n");
+    }
+    color(BLANCO);
+    printf("\n\n");
+}
+
+void ordenar(int *v, int tamaño){
+    int i,j,aux;
+
+    for(i=0;i<tamaño;i++){
+        for(j=1+i;j<tamaño;j++){
+            if(v[i]>v[j]){
+                aux=v[i];
+                v[i]=v[j];
+                v[j]=aux;
+            }
+        }
+    }
+}
+
+void colocar_barcos(char M[10][10]){
+    int i, j, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, selector=0, barcos_colocados=0;
+    char auxchar[2], res[6];
+
+    v=(int *)malloc(5 * sizeof(int));
+
+    for(i=0;i<5;i++){
+        v[i]=i;
+    }
+
+    do{
+        print_matriz(M,selector);
 
         i=1;
 
@@ -138,7 +246,7 @@ void jugarIA(){
         }
 
         fflush(stdin);
-        fgets(auxchar,sizeof(auxchar),stdin);
+        fgets(auxchar,2,stdin);
         sel=atoi(auxchar);
         if(sel<=0 || sel>=i){
             system("cls");
@@ -147,7 +255,7 @@ void jugarIA(){
             Sleep(500);
         }else{
             do{
-                printf("\nIntroduce los extremos de la ubicacion de tu barco formato B2-E2\n");
+                printf("\nIntroduce los extremos de la ubicacion de tu barco (formato A2-E2)\n");
                 fflush(stdin);
                 fgets(res,6,stdin);
                 system("cls");
@@ -210,13 +318,13 @@ void jugarIA(){
                                     break;
                             }
                             for(j=i;j<resta1+i;j++){
-                                if(J1[(res[1]-'0')-1][j]=='O' || J1[(res[1]-'0')+1][j]=='O' || J1[res[1]-'0'][j-1]=='O' || J1[res[1]-'0'][j+1]=='O'){
+                                if(M[(res[1]-'0')-1][j]=='O' || M[(res[1]-'0')+1][j]=='O' || M[res[1]-'0'][j-1]=='O' || M[res[1]-'0'][j+1]=='O'){
                                     sel=-1;
                                 }
                             }
                             if(sel!=-1){
-                               for(j=i;j<resta1+i;j++){
-                                    J1[res[1]-'0'][j]='O';
+                                for(j=i;j<resta1+i;j++){
+                                    M[res[1]-'0'][j]='O';
                                 }  
                             }       
                         }else{
@@ -253,13 +361,13 @@ void jugarIA(){
                                     break;
                             }
                             for(j=i;j<resta1+i;j++){
-                                if(J1[j-1][toupper(res[0])-65]=='O' || J1[j+1][toupper(res[0])-65]=='O' || J1[j][(toupper(res[0])-65)-1]=='O' || J1[j][(toupper(res[0])-65)+1]=='O'){
+                                if(M[j-1][toupper(res[0])-65]=='O' || M[j+1][toupper(res[0])-65]=='O' || M[j][(toupper(res[0])-65)-1]=='O' || M[j][(toupper(res[0])-65)+1]=='O'){
                                     sel=-1;
                                 }
                             }
                             if(sel!=-1){
                                 for(j=i;j<resta2+i;j++){
-                                    J1[j][toupper(res[0])-65]='O';
+                                    M[j][toupper(res[0])-65]='O';
                                 }
                             }
                         }
@@ -316,63 +424,19 @@ void jugarIA(){
     }while(barcos_colocados!=5);
 }
 
-void print_matriz(char M1[10][10], char M2[10][10], int selector){
-    int i,j;
+int atacar(char M[10][10], char MB[10][10]){
+    char res[3], auxchar;
 
-    printf("     |     |     |     |     |     |     |     |     |     |     |\n");
-    printf("     |  A  |  B  |  C  |  D  |  E  |  F  |  G  |  H  |  I  |  J  |\n");
-    printf("_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|\n");
-    for(i=0;i<10;i++){
-        printf("     ");
-        for(j=0;j<10;j++){
-            printf("|");
-            if(M1[i][j]=='.'){
-                color(AZUL_AZUL);
-            }
-            printf("     ");
-            color(BLANCO);
-        }
-        printf("|\n");
-        printf("  %i  ",i);
-        printf("|");
-        for(j=0;j<10;j++){
-            if(M1[i][j]=='X'){
-                color(ROJO);
-            }
-            if(M1[i][j]=='.'){
-                color(AZUL_AZUL);
-            }
-            printf("  %c  ",M1[i][j]);
-            color(BLANCO);
-            printf("|");
-        }
-        printf("\n");
-        printf("_____");
-        for(j=0;j<10;j++){
-            color(BLANCO);
-            printf("|");
-            if(M1[i][j]=='.'){
-                color(AZUL_BLANCO);
-            }
-            printf("_____");
-        }
-        color(BLANCO);
-        printf("|\n");
+    printf("\nIntroduce la casilla que vas a atacar (formato A0)\n");
+    fflush(stdin);
+    fgets(res,3,stdin);
+
+    if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
+        auxchar=res[1];
+        res[1]=res[0];
+        res[0]=auxchar;
     }
-    color(BLANCO);
-    printf("\n\n");
-}
+    if()
 
-void ordenar(int *v, int tamaño){
-    int i,j,aux;
-
-    for(i=0;i<tamaño;i++){
-        for(j=1+i;j<tamaño;j++){
-            if(v[i]>v[j]){
-                aux=v[i];
-                v[i]=v[j];
-                v[j]=aux;
-            }
-        }
-    }
+    return 0;
 }
