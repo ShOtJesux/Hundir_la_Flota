@@ -24,7 +24,7 @@ void jugarIA(int);
 void print_matriz(char [10][10], int);
 void ordenar(int *,int);
 void colocar_barcos(char [10][10]);
-int atacar(char [10][10], char [10][10]);
+int atacar(char [10][10], char [10][10], int);
 
 int main(){
     char res;
@@ -90,7 +90,7 @@ void color(int k){
 }
 
 void jugarIA(int estado){
-    int i, j, finalizar;
+    int i, j, hundidos1, hundidos2;
     char J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
 
     for (i=0;i<10;i++){
@@ -136,18 +136,18 @@ void jugarIA(int estado){
     Sleep(1000);
 
     do{
-        printf("TURNO DEL JUGADOR %i\n\n",estado);///////////
+        printf("TURNO DEL JUGADOR %i\n\n",estado);
         Sleep(800);
 
         if(estado==1){
-            finalizar=atacar(J2,J2B);
+            hundidos1=atacar(J2,J2B,hundidos1);
             estado++;
         }else{
-            finalizar=atacar(J1,J1B);
+            hundidos2=atacar(J1,J1B,hundidos2);
             estado--;
         }
 
-    }while(finalizar==0);
+    }while(hundidos1!=5 || hundidos2!=5);
 }
 
 void print_matriz(char M[10][10], int selector){
@@ -430,8 +430,8 @@ void colocar_barcos(char M[10][10]){
     }while(barcos_colocados!=5);
 }
 
-int atacar(char M[10][10], char MB[10][10]){
-    int i,j,k,aux;
+int atacar(char M[10][10], char MB[10][10], int barcos_hundidos){
+    int i=0,aux=0;
     char res[3], auxchar;
 
     printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
@@ -445,7 +445,7 @@ int atacar(char M[10][10], char MB[10][10]){
         res[0]=auxchar;
     }
     if((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9')){
-        if(MB[res[1]-'0'][toupper(res[0])-65]=' '){
+        if(MB[res[1]-'0'][toupper(res[0])-65]==' '){
             printf(".");
             Sleep(500);
             printf(".");
@@ -458,52 +458,48 @@ int atacar(char M[10][10], char MB[10][10]){
                 printf("AGUA\n\n");
                 MB[res[1]-'0'][toupper(res[0])-65]='A';
             }else{
-                i=0;
-                j=0;
-                k=0;
+                MB[res[1]-'0'][toupper(res[0])-65]='X';
+                ///Poner para tocar el barco
                 if(M[(res[1]-'0')+1][toupper(res[0])-65]==' ' && M[(res[1]-'0')-1][toupper(res[0])-65]==' '){
-                    if(M[(res[1]-'0')][(toupper(res[0])-65)-1]==' '){
-                        while(M[(res[1]-'0')][(toupper(res[0])-65)+i]!=' '){
-                            if(M[(res[1]-'0')][(toupper(res[0])-65)+i]=='O'){
-                                j=1;
-                            }                                                                                                                                                                                                               
-                            i++;
-                        }
+                    while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X' || M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
+                        i++;
                     }
-                    i=0;
-                    if(M[(res[1]-'0')][(toupper(res[0])-65)+1]==' '){
-                        while(M[(res[1]-'0')][(toupper(res[0])-65)-i]!=' '){
-                            if(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
-                                k=1;
-                            }
-                            i++;
+                    i--;
+                    while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X' || M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
+                        if(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
+                            aux=1;
                         }
+                        i--;
                     }
-                    i=0
-                    if(j==0 && k==0){
-                        while(M[(res[1]-'0')][(toupper(res[0])-65)+i]!=' '){
-                            //////
+                    if(aux==0){
+                        i++;
+                        while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X'){
+                            MB[(res[1]-'0')][(toupper(res[0])-65)-i]=='H';
+                            i++;
                         }
                     }
                 }else{
-                    if(M[(res[1]-'0')-1][(toupper(res[0])-65)]==' '){
-                        while(M[(res[1]-'0')+i][(toupper(res[0])-65)]!=' '){
-                            if(M[(res[1]-'0')+i][(toupper(res[0])-65)]=='O'){
-                                j=1;
-                            }
-                            i++;
+                    while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X' || M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
+                        i++;
+                    }
+                    i--;
+                    while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X' || M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
+                        if(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
+                            aux=1;
                         }
-                    }else{
-                        while(M[(res[1]-'0')-i][(toupper(res[0])-65)]!=' '){
-                            if(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
-                                k=1;
-                            }
+                        i--;
+                    }
+                    if(aux==0){
+                        i++;
+                        while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X'){
+                            MB[(res[1]-'0')-i][(toupper(res[0])-65)]=='H';
                             i++;
                         }
                     }
                 }
-                if(j==0){
+                if(aux==0){
                     printf("HUNDIDO !!!");
+                    barcos_hundidos++;
                 }
             }
         }else{
@@ -513,7 +509,7 @@ int atacar(char M[10][10], char MB[10][10]){
         printf("Formato incorrecto\n\n");
     }
 
-    return 0;
+    return barcos_hundidos;
 }
 
 //'O'=Barco colocado en ese lugar
