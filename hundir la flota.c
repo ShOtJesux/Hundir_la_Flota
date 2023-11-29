@@ -13,6 +13,12 @@
 #define AZUL_ROJO 156
 #define AZUL_BLANCO 159
 
+//'O'=Barco colocado en ese lugar
+//'X'=Barco tocado
+//' '=Casilla libre
+//'A'=Agua
+//'H'=Barco totalmente hundido
+
 void color(int);
 void jugarIA(int);
 void print_matriz(char [10][10], int);
@@ -255,7 +261,7 @@ void colocar_barcos(char M[10][10]){
             Sleep(500);
         }else{
             do{
-                printf("\nIntroduce los extremos de la ubicacion de tu barco (formato A2-E2)\n");
+                printf("\nIntroduce los extremos de la ubicacion de tu barco (Ejemplo A2-E2)\n");
                 fflush(stdin);
                 fgets(res,6,stdin);
                 system("cls");
@@ -425,18 +431,93 @@ void colocar_barcos(char M[10][10]){
 }
 
 int atacar(char M[10][10], char MB[10][10]){
+    int i,j,k,aux;
     char res[3], auxchar;
 
-    printf("\nIntroduce la casilla que vas a atacar (formato A0)\n");
+    printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
     fflush(stdin);
     fgets(res,3,stdin);
+    system("cls");
 
     if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
         auxchar=res[1];
         res[1]=res[0];
         res[0]=auxchar;
     }
-    if()
+    if((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9')){
+        if(MB[res[1]-'0'][toupper(res[0])-65]=' '){
+            printf(".");
+            Sleep(500);
+            printf(".");
+            Sleep(500);
+            printf(".");
+            Sleep(700);
+            system("cls");
+            Sleep(1000);
+            if(M[res[1]-'0'][toupper(res[0])-65]==' '){
+                printf("AGUA\n\n");
+                MB[res[1]-'0'][toupper(res[0])-65]='A';
+            }else{
+                i=0;
+                j=0;
+                k=0;
+                if(M[(res[1]-'0')+1][toupper(res[0])-65]==' ' && M[(res[1]-'0')-1][toupper(res[0])-65]==' '){
+                    if(M[(res[1]-'0')][(toupper(res[0])-65)-1]==' '){
+                        while(M[(res[1]-'0')][(toupper(res[0])-65)+i]!=' '){
+                            if(M[(res[1]-'0')][(toupper(res[0])-65)+i]=='O'){
+                                j=1;
+                            }                                                                                                                                                                                                               
+                            i++;
+                        }
+                    }
+                    i=0;
+                    if(M[(res[1]-'0')][(toupper(res[0])-65)+1]==' '){
+                        while(M[(res[1]-'0')][(toupper(res[0])-65)-i]!=' '){
+                            if(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
+                                k=1;
+                            }
+                            i++;
+                        }
+                    }
+                    i=0
+                    if(j==0 && k==0){
+                        while(M[(res[1]-'0')][(toupper(res[0])-65)+i]!=' '){
+                            //////
+                        }
+                    }
+                }else{
+                    if(M[(res[1]-'0')-1][(toupper(res[0])-65)]==' '){
+                        while(M[(res[1]-'0')+i][(toupper(res[0])-65)]!=' '){
+                            if(M[(res[1]-'0')+i][(toupper(res[0])-65)]=='O'){
+                                j=1;
+                            }
+                            i++;
+                        }
+                    }else{
+                        while(M[(res[1]-'0')-i][(toupper(res[0])-65)]!=' '){
+                            if(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
+                                k=1;
+                            }
+                            i++;
+                        }
+                    }
+                }
+                if(j==0){
+                    printf("HUNDIDO !!!");
+                }
+            }
+        }else{
+            printf("Ya has atacado esa casilla\n\n");
+        }
+    }else{
+        printf("Formato incorrecto\n\n");
+    }
 
     return 0;
 }
+
+//'O'=Barco colocado en ese lugar
+//'X'=Barco tocado
+//' '=Casilla libre
+//'A'=Agua
+//'H'=Barco totalmente hundido
