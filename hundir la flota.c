@@ -23,28 +23,21 @@ void color(int);
 void jugarIA(int);
 void print_matriz(char [10][10], int);
 void ordenar(int *,int);
-void colocar_barcos(char [10][10]);
-int atacar(char [10][10], char [10][10], int);
+void colocar_barcos(char [10][10], int);
+int atacar(char [10][10], char [10][10], int, int);
+int random(int,int);
+//int atacarIA(char [10][10], char [10][10], int);
 
 int main(){
     char res;
+
+    srand(time(NULL));
 
     system("cls");
     printf("Programa creado por:\n");
     printf("    - Twitter: @DurumSoloCarne_\n");
     printf("    - Discord: @durumsolocarne\n\n\n");
     Sleep(1000);
-
-    /*system("cls");
-    printf(".");
-    Sleep(500);
-    printf(".");
-    Sleep(500);
-    printf(".");
-    Sleep(700);
-    system("cls");
-    printf("AGUA\n\n");
-    Sleep(1000);*/
 
     do{
         printf("---------- HUNDIR LA FLOTA ----------\n\n");
@@ -61,10 +54,10 @@ int main(){
 
         switch(res){
             case '1':
-                jugarIA(0);
+                jugarIA(1);
                 break;
             case '2':
-                jugarIA(1);
+                jugarIA(0);
                 break;
             case '3':
 
@@ -89,8 +82,8 @@ void color(int k){
     SetConsoleTextAttribute(Consola,k);
 }
 
-void jugarIA(int estado){
-    int i, j, hundidos1, hundidos2;
+void jugarIA(int IA){
+    int i,j,hundidos1,hundidos2,turno=1;
     char J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
 
     for (i=0;i<10;i++){
@@ -101,10 +94,6 @@ void jugarIA(int estado){
             J2B[i][j]=' ';
         }
     }
-    printf("%c",J1[1][1]);
-    printf("%c",J2B[1][1]);
-    printf("%c",J1B[1][1]);
-
     system("cls");
 
     printf("FASE 1: ");
@@ -112,23 +101,21 @@ void jugarIA(int estado){
     printf("COLOCA TUS BARCOS\n\n");
     Sleep(1000);
 
-    do{
+    //colocar_barcos(J2B,IA);
+    //print_matriz(J2B,0);
+    //Sleep(10000);
         
-        if(estado==1 || estado==2){
-            printf("TURNO DEL JUGADOR %i\n\n",estado);
-            Sleep(800);
-        }
-        
-        if(estado!=2){
-            colocar_barcos(J1B);
-        }else{
-            colocar_barcos(J2B);
-        }
-        estado++;
-
-    }while(estado==2);
-
-    estado=1;
+    if(IA!=1){
+        printf("TURNO DEL JUGADOR 1\n\n");
+        Sleep(800);
+    }
+    colocar_barcos(J1B,0);
+    
+    if(IA!=1){
+        printf("TURNO DEL JUGADOR 2\n\n");
+        Sleep(800);
+    }
+    colocar_barcos(J2B,IA);
 
     printf("FASE 2: ");
     Sleep(800);
@@ -136,15 +123,17 @@ void jugarIA(int estado){
     Sleep(1000);
 
     do{
-        printf("TURNO DEL JUGADOR %i\n\n",estado);
+        if(IA!=1){
+            printf("TURNO DEL JUGADOR %i\n\n",turno);
+        }
         Sleep(800);
 
-        if(estado==1){
-            hundidos1=atacar(J2,J2B,hundidos1);
-            estado++;
+        if(turno==1){
+            hundidos1=atacar(J2,J2B,hundidos1,0);
+            turno++;
         }else{
-            hundidos2=atacar(J1,J1B,hundidos2);
-            estado--;
+            hundidos2=atacar(J1,J1B,hundidos2,IA);
+            turno--;
         }
 
     }while(hundidos1!=5 || hundidos2!=5);
@@ -214,9 +203,9 @@ void ordenar(int *v, int tamaño){
     }
 }
 
-void colocar_barcos(char M[10][10]){
-    int i, j, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, selector=0, barcos_colocados=0;
-    char auxchar[2], res[6];
+void colocar_barcos(char M[10][10], int IA){
+    int i, j,pos1,pos2, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, selector=0, barcos_colocados=0;
+    char auxchar[3], res[6];
 
     v=(int *)malloc(5 * sizeof(int));
 
@@ -225,61 +214,98 @@ void colocar_barcos(char M[10][10]){
     }
 
     do{
-        print_matriz(M,selector);
+        if(IA!=1){
+            print_matriz(M,selector);
 
-        i=1;
+            i=1;
 
-        printf("Elige un barco para colocar:\n");
-        if(v[0]==0 || v[1]==0 || v[2]==0 || v[3]==0 || v[4]==0){
-            printf("    %i. Portaaviones:     5 casillas\n",i);
-            i++;
-        }
-        if(v[0]==1 || v[1]==1 || v[2]==1 || v[3]==1 || v[4]==1){
-            printf("    %i. Acorazado:        4 casillas\n",i);
-            i++;
-        }
-        if(v[0]==2 || v[1]==2 || v[2]==2 || v[3]==2 || v[4]==2){
-            printf("    %i. Submarino:        3 casillas\n",i);
-            i++;
-        }
-        if(v[0]==3 || v[1]==3 || v[2]==3 || v[3]==3 || v[4]==3){
-            printf("    %i. Destructor:       3 casillas\n",i);
-            i++;
-        }
-        if(v[0]==4 || v[1]==4 || v[2]==4 || v[3]==4 || v[4]==4){
-            printf("    %i. Barco patrulla:   2 casillas\n",i);
-            i++;
-        }
+            printf("Elige un barco para colocar:\n");
+            if(v[0]==0 || v[1]==0 || v[2]==0 || v[3]==0 || v[4]==0){
+                printf("    %i. Portaaviones:     5 casillas\n",i);
+                i++;
+            }
+            if(v[0]==1 || v[1]==1 || v[2]==1 || v[3]==1 || v[4]==1){
+                printf("    %i. Acorazado:        4 casillas\n",i);
+                i++;
+            }
+            if(v[0]==2 || v[1]==2 || v[2]==2 || v[3]==2 || v[4]==2){
+                printf("    %i. Submarino:        3 casillas\n",i);
+                i++;
+            }
+            if(v[0]==3 || v[1]==3 || v[2]==3 || v[3]==3 || v[4]==3){
+                printf("    %i. Destructor:       3 casillas\n",i);
+                i++;
+            }
+            if(v[0]==4 || v[1]==4 || v[2]==4 || v[3]==4 || v[4]==4){
+                printf("    %i. Barco patrulla:   2 casillas\n",i);
+                i++;
+            }
 
-        fflush(stdin);
-        fgets(auxchar,2,stdin);
-        sel=atoi(auxchar);
-        if(sel<=0 || sel>=i){
+            fflush(stdin);
+            fgets(auxchar,3,stdin);
+            sel=atoi(auxchar);
+        }else{
+            do{
+                pos1=rand()%10;
+                pos2=rand()%10;
+            }while(pos1+v_tamaño[barcos_colocados]>=10 && pos2+v_tamaño[barcos_colocados]>=10);
+        }
+        if(IA!=1 && (sel<=0 || sel>=i)){
             system("cls");
             printf("Opcion incorrecta\n\n");
             sel=0;
             Sleep(500);
         }else{
             do{
-                printf("\nIntroduce los extremos de la ubicacion de tu barco (Ejemplo A2-E2)\n");
-                fflush(stdin);
-                fgets(res,6,stdin);
-                system("cls");
-                if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
-                    auxchar[0]=res[1];
-                    res[1]=res[0];
-                    res[0]=auxchar[0];
+                if(IA!=1){
+                    printf("\nIntroduce los extremos de la ubicacion de tu barco (Ejemplo A2-E2)\n");
+                    fflush(stdin);
+                    fgets(res,6,stdin);
+                    system("cls");
+                    if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
+                        auxchar[0]=res[1];
+                        res[1]=res[0];
+                        res[0]=auxchar[0];
+                    }
+                    if(toupper(res[4])=='A' || toupper(res[4])=='B' || toupper(res[4])=='C' || toupper(res[4])=='D' || toupper(res[4])=='E' || toupper(res[4])=='F' || toupper(res[4])=='G' || toupper(res[4])=='H' || toupper(res[4])=='I' || toupper(res[4])=='J'){
+                        auxchar[0]=res[4];
+                        res[4]=res[3];
+                        res[3]=auxchar[0];
+                    }
                 }
-                if(toupper(res[4])=='A' || toupper(res[4])=='B' || toupper(res[4])=='C' || toupper(res[4])=='D' || toupper(res[4])=='E' || toupper(res[4])=='F' || toupper(res[4])=='G' || toupper(res[4])=='H' || toupper(res[4])=='I' || toupper(res[4])=='J'){
-                    auxchar[0]=res[4];
-                    res[4]=res[3];
-                    res[3]=auxchar[0];
-                }
-                if(res[5]=='\0' && res[2]=='-' && (toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9') && (toupper(res[3])=='A' || toupper(res[3])=='B' || toupper(res[3])=='C' || toupper(res[3])=='D' || toupper(res[3])=='E' || toupper(res[3])=='F' || toupper(res[3])=='G' || toupper(res[3])=='H' || toupper(res[3])=='I' || toupper(res[3])=='J') && (res[4]=='0' || res[4]=='1' || res[4]=='2' || res[4]=='3' || res[4]=='4' || res[4]=='5' || res[4]=='6' || res[4]=='7' || res[4]=='8' || res[4]=='9')){
-                    resta1=abs(res[0]-res[3])+1;
-                    resta2=abs(res[1]-res[4])+1;
-
-                    if((resta1==1 && resta2==v_tamaño[sel-1]) || (resta1==v_tamaño[sel-1] && resta2==1)){
+                if(IA==1 || (res[5]=='\0' && res[2]=='-' && (toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9') && (toupper(res[3])=='A' || toupper(res[3])=='B' || toupper(res[3])=='C' || toupper(res[3])=='D' || toupper(res[3])=='E' || toupper(res[3])=='F' || toupper(res[3])=='G' || toupper(res[3])=='H' || toupper(res[3])=='I' || toupper(res[3])=='J') && (res[4]=='0' || res[4]=='1' || res[4]=='2' || res[4]=='3' || res[4]=='4' || res[4]=='5' || res[4]=='6' || res[4]=='7' || res[4]=='8' || res[4]=='9'))){
+                    if(IA!=1){
+                        resta1=abs(res[0]-res[3])+1;
+                        resta2=abs(res[1]-res[4])+1;
+                    }else{
+                        sel=-2;
+                        if(pos2+v_tamaño[barcos_colocados]<10){
+                            for(i=pos2;i<v_tamaño[barcos_colocados]+pos2;i++){
+                                if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O'){
+                                    sel=-1;
+                                }
+                            }
+                            if(sel!=-1){
+                                for(i=pos2;i<v_tamaño[barcos_colocados]+pos2;i++){
+                                    M[i][pos1]='O';
+                                }
+                                barcos_colocados++;
+                            }
+                        }else{
+                            for(i=pos1;i<v_tamaño[barcos_colocados]+pos1;i++){
+                                if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O'){
+                                    sel=-1;
+                                }
+                            }
+                            if(sel!=-1){
+                                for(i=pos1;i<v_tamaño[barcos_colocados]+pos1;i++){
+                                    M[pos2][i]='O';
+                                }
+                                barcos_colocados++;
+                            }
+                        }
+                    }
+                    if(IA!=1 &&((resta1==1 && resta2==v_tamaño[sel-1]) || (resta1==v_tamaño[sel-1] && resta2==1))){
                         if(res[0]>res[3]){
                             auxchar[0]=res[0];
                             res[0]=res[3];
@@ -411,12 +437,14 @@ void colocar_barcos(char M[10][10]){
                         }
                         
                     }else{
-                        if(resta1!=1 && resta2!=1){
-                            printf("No se pueden colocar barcos en diagonal\n\n");
-                        }else if((resta1==1 && resta2<v_tamaño[sel-1]) || (resta1<v_tamaño[sel-1] && resta2==1)){
-                            printf("Este barco requiere mas casillas\n\n");
-                        }else{
-                            printf("Este barco requiere menos casillas\n\n");
+                        if(IA!=1){
+                            if(resta1!=1 && resta2!=1){
+                                printf("No se pueden colocar barcos en diagonal\n\n");
+                            }else if((resta1==1 && resta2<v_tamaño[sel-1]) || (resta1<v_tamaño[sel-1] && resta2==1)){
+                                printf("Este barco requiere mas casillas\n\n");
+                            }else{
+                                printf("Este barco requiere menos casillas\n\n");
+                            }
                         }
                         //Sleep(500);
                     }
@@ -430,84 +458,102 @@ void colocar_barcos(char M[10][10]){
     }while(barcos_colocados!=5);
 }
 
-int atacar(char M[10][10], char MB[10][10], int barcos_hundidos){
-    int i=0,aux=0;
+int atacar(char M[10][10], char MB[10][10], int barcos_hundidos, int IA){
+    int i,aux,pos1,pos2;
     char res[3], auxchar;
 
-    printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
-    fflush(stdin);
-    fgets(res,3,stdin);
-    system("cls");
-
-    if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
-        auxchar=res[1];
-        res[1]=res[0];
-        res[0]=auxchar;
-    }
-    if((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9')){
-        if(MB[res[1]-'0'][toupper(res[0])-65]==' '){
-            printf(".");
-            Sleep(500);
-            printf(".");
-            Sleep(500);
-            printf(".");
-            Sleep(700);
+    do{
+        aux=0;
+        if(IA!=1){
+            printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
+            fflush(stdin);
+            fgets(res,3,stdin);
             system("cls");
-            Sleep(1000);
-            if(M[res[1]-'0'][toupper(res[0])-65]==' '){
-                printf("AGUA\n\n");
-                MB[res[1]-'0'][toupper(res[0])-65]='A';
-            }else{
-                MB[res[1]-'0'][toupper(res[0])-65]='X';
-                ///Poner para tocar el barco
-                if(M[(res[1]-'0')+1][toupper(res[0])-65]==' ' && M[(res[1]-'0')-1][toupper(res[0])-65]==' '){
-                    while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X' || M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
-                        i++;
-                    }
-                    i--;
-                    while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X' || M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
-                        if(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='O'){
-                            aux=1;
-                        }
-                        i--;
-                    }
-                    if(aux==0){
-                        i++;
-                        while(M[(res[1]-'0')][(toupper(res[0])-65)-i]=='X'){
-                            MB[(res[1]-'0')][(toupper(res[0])-65)-i]=='H';
-                            i++;
-                        }
-                    }
-                }else{
-                    while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X' || M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
-                        i++;
-                    }
-                    i--;
-                    while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X' || M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
-                        if(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='O'){
-                            aux=1;
-                        }
-                        i--;
-                    }
-                    if(aux==0){
-                        i++;
-                        while(M[(res[1]-'0')-i][(toupper(res[0])-65)]=='X'){
-                            MB[(res[1]-'0')-i][(toupper(res[0])-65)]=='H';
-                            i++;
-                        }
-                    }
-                }
-                if(aux==0){
-                    printf("HUNDIDO !!!");
-                    barcos_hundidos++;
-                }
+
+            if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
+                auxchar=res[1];
+                res[1]=res[0];
+                res[0]=auxchar;
             }
         }else{
-            printf("Ya has atacado esa casilla\n\n");
+            pos1=rand()%10;
+            pos2=rand()%10;
         }
-    }else{
-        printf("Formato incorrecto\n\n");
-    }
+        if(IA==1 || ((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9'))){
+            if(IA!=1){
+                pos1=res[1]-'0';
+                pos2=toupper(res[0])-65;
+            }
+            if(MB[pos1][pos2]==' '){
+                for(i=0;i<3;i++){
+                    printf(".");
+                    Sleep(500);
+                }
+                system("cls");
+                Sleep(1000);
+                i=0;
+                if(M[pos1][pos2]==' '){
+                    if(IA!=1){
+                        printf("AGUA\n\n");
+                    }
+                    MB[pos1][pos2]='A';
+                }else{
+                    MB[pos1][pos2]='X';
+                    if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
+                        while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                            i++;
+                        }
+                        i--;
+                        while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                            if(M[pos1][pos2-i]=='O'){
+                                aux=1;
+                            }
+                            i--;
+                        }
+                        if(aux==0){
+                            i++;
+                            while(M[pos1][pos2-i]=='X'){
+                                MB[pos1][pos2-i]='H';
+                                i++;
+                            }
+                        }
+                    }else{
+                        while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                            i++;
+                        }
+                        i--;
+                        while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                            if(M[pos1-i][pos2]=='O'){
+                                aux=1;
+                            }
+                            i--;
+                        }
+                        if(aux==0){
+                            i++;
+                            while(M[pos1-i][pos2]=='X'){
+                                MB[pos1-i][pos2]='H';
+                                i++;
+                            }
+                        }
+                    }
+                    if(aux==0){
+                        if(IA!=1){
+                            printf("HUNDIDO !!!\n\n");
+                        }
+                        barcos_hundidos++;
+                    }
+                }
+            }else{
+                if(IA!=1){
+                    printf("Ya has atacado esa casilla\n\n");
+                }
+                aux=2;
+            }
+        }else{
+            printf("Formato incorrecto\n\n");
+            aux=2;
+        }
+    }while(aux==2);
 
     return barcos_hundidos;
 }
@@ -517,3 +563,75 @@ int atacar(char M[10][10], char MB[10][10], int barcos_hundidos){
 //' '=Casilla libre
 //'A'=Agua
 //'H'=Barco totalmente hundido
+
+/*int atacarIA(char M[10][10], char MB[10][10], int barcos_hundidos){
+    int i,aux,pos1,pos2;
+
+    do{
+        pos1=rand()%10;
+        pos2=rand()%10;
+
+        printf(".");
+        Sleep(500);
+        printf(".");
+        Sleep(500);
+        printf(".");
+        Sleep(700);
+        system("cls");
+        Sleep(1000);
+        if(M[pos1][pos2]==' '){
+            MB[pos1][pos2]='A';
+        }else{
+            MB[pos1][pos2]='X';
+            if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
+                while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                    i++;
+                }
+                i--;
+                while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                    if(M[pos1][pos2-i]=='O'){
+                        aux=1;
+                    }
+                    i--;
+                }
+                if(aux==0){
+                    i++;
+                    while(M[pos1][pos2-i]=='X'){
+                        MB[pos1][pos2-i]='H';
+                        i++;
+                    }
+                }
+            }else{
+                while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                    i++;
+                }
+                i--;
+                while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                    if(M[pos1-i][pos2]=='O'){
+                        aux=1;
+                    }
+                    i--;
+                }
+                if(aux==0){
+                    i++;
+                    while(M[pos1-i][pos2]=='X'){
+                        MB[pos1-i][pos2]='H';
+                        i++;
+                    }
+                }
+            }
+            if(aux==0){
+                barcos_hundidos++;
+            }
+        }
+    }while(MB[pos1][pos2]!=' ');
+}*/
+
+int random(int a, int b){
+    int res;
+
+    srand(time(NULL));
+
+    res=a+rand()%(b-a+1);
+    return res;
+}
