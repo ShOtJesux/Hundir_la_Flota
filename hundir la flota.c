@@ -25,8 +25,6 @@ void print_matriz(char [10][10], int);
 void ordenar(int *,int);
 void colocar_barcos(char [10][10], int);
 int atacar(char [10][10], char [10][10], int, int);
-int random(int,int);
-//int atacarIA(char [10][10], char [10][10], int);
 
 int main(){
     char res;
@@ -101,9 +99,9 @@ void jugarIA(int IA){
     printf("COLOCA TUS BARCOS\n\n");
     Sleep(1000);
 
-    //colocar_barcos(J2B,IA);
-    //print_matriz(J2B,0);
-    //Sleep(10000);
+    colocar_barcos(J2B,IA);
+    print_matriz(J2B,0);
+    Sleep(10000);
         
     if(IA!=1){
         printf("TURNO DEL JUGADOR 1\n\n");
@@ -563,75 +561,3 @@ int atacar(char M[10][10], char MB[10][10], int barcos_hundidos, int IA){
 //' '=Casilla libre
 //'A'=Agua
 //'H'=Barco totalmente hundido
-
-/*int atacarIA(char M[10][10], char MB[10][10], int barcos_hundidos){
-    int i,aux,pos1,pos2;
-
-    do{
-        pos1=rand()%10;
-        pos2=rand()%10;
-
-        printf(".");
-        Sleep(500);
-        printf(".");
-        Sleep(500);
-        printf(".");
-        Sleep(700);
-        system("cls");
-        Sleep(1000);
-        if(M[pos1][pos2]==' '){
-            MB[pos1][pos2]='A';
-        }else{
-            MB[pos1][pos2]='X';
-            if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
-                while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                    i++;
-                }
-                i--;
-                while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                    if(M[pos1][pos2-i]=='O'){
-                        aux=1;
-                    }
-                    i--;
-                }
-                if(aux==0){
-                    i++;
-                    while(M[pos1][pos2-i]=='X'){
-                        MB[pos1][pos2-i]='H';
-                        i++;
-                    }
-                }
-            }else{
-                while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                    i++;
-                }
-                i--;
-                while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                    if(M[pos1-i][pos2]=='O'){
-                        aux=1;
-                    }
-                    i--;
-                }
-                if(aux==0){
-                    i++;
-                    while(M[pos1-i][pos2]=='X'){
-                        MB[pos1-i][pos2]='H';
-                        i++;
-                    }
-                }
-            }
-            if(aux==0){
-                barcos_hundidos++;
-            }
-        }
-    }while(MB[pos1][pos2]!=' ');
-}*/
-
-int random(int a, int b){
-    int res;
-
-    srand(time(NULL));
-
-    res=a+rand()%(b-a+1);
-    return res;
-}
