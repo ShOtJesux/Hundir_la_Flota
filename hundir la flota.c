@@ -511,7 +511,7 @@ int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
                             }
                             i--;
                         }
-                        if(aux==0){
+                        if(aux==1){
                             i++;
                             while(M[pos1][pos2-i]=='X'){
                                 MB[pos1][pos2-i]='H';
@@ -529,7 +529,7 @@ int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
                             }
                             i--;
                         }
-                        if(aux==0){
+                        if(aux==1){
                             i++;
                             while(M[pos1-i][pos2]=='X'){
                                 MB[pos1-i][pos2]='H';
@@ -537,7 +537,7 @@ int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
                             }
                         }
                     }
-                    if(aux==0){
+                    if(aux==1){
                         printf("HUNDIDO !!!\n\n");
                         barcos_hundidos++;
                     }
@@ -579,7 +579,7 @@ int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,char pos_ant1[2]
                         }
                         i--;
                     }
-                    if(aux==0){
+                    if(aux==1){
                         i++;
                         while(M[pos1][pos2-i]=='X'){
                             MB[pos1][pos2-i]='H';
@@ -597,7 +597,7 @@ int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,char pos_ant1[2]
                         }
                         i--;
                     }
-                    if(aux==0){
+                    if(aux==1){
                         i++;
                         while(M[pos1-i][pos2]=='X'){
                             MB[pos1-i][pos2]='H';
@@ -605,7 +605,7 @@ int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,char pos_ant1[2]
                         }
                     }
                 }
-                if(aux==0){
+                if(aux==1){
                     barcos_hundidos++;
                 }
             }
