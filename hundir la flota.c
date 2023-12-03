@@ -21,10 +21,11 @@
 
 void color(int);
 void jugarIA(int);
-void print_matriz(char [10][10], int);
+void print_matriz(char [11][11], int);
 void ordenar(int *,int);
-void colocar_barcos(char [10][10], int);
-int atacar(char [10][10], char [10][10], int, int);
+void colocar_barcos(char [11][11], int);
+int atacar(char [10][10], char [11][11], int);
+int atacarIA(char [10][10], char [11][11], int, char [2], char [2]);
 
 int main(){
     char res;
@@ -82,7 +83,7 @@ void color(int k){
 
 void jugarIA(int IA){
     int i,j,hundidos1,hundidos2,turno=1;
-    char J1[10][10], J1B[10][10], J2[10][10], J2B[10][10];
+    char J1[10][10], J1B[11][11], J2[10][10], J2B[11][11], pos_ant1[2]={'\0','\0'}, pos_ant2[2]={'\0','\0'};
 
     for (i=0;i<10;i++){
         for(j=0;j<10;j++){
@@ -99,9 +100,9 @@ void jugarIA(int IA){
     printf("COLOCA TUS BARCOS\n\n");
     Sleep(1000);
 
-    colocar_barcos(J2B,IA);
-    print_matriz(J2B,0);
-    Sleep(10000);
+    //colocar_barcos(J2B,IA);
+    //print_matriz(J2B,0);
+    //Sleep(10000);
         
     if(IA!=1){
         printf("TURNO DEL JUGADOR 1\n\n");
@@ -126,18 +127,28 @@ void jugarIA(int IA){
         }
         Sleep(800);
 
-        if(turno==1){
-            hundidos1=atacar(J2,J2B,hundidos1,0);
-            turno++;
+        if(IA!=1){
+            if(turno==1){
+                hundidos1=atacar(J2,J2B,hundidos1);
+                turno++;
+            }else{
+                hundidos2=atacar(J1,J1B,hundidos2);
+                turno--;
+            }
         }else{
-            hundidos2=atacar(J1,J1B,hundidos2,IA);
-            turno--;
+            if(turno==1){
+                hundidos1=atacar(J2,J2B,hundidos1);
+                turno++;
+            }else{
+                hundidos2=atacarIA(J1,J1B,hundidos2,pos_ant1,pos_ant2);
+                turno--;
+            }
         }
 
     }while(hundidos1!=5 || hundidos2!=5);
 }
 
-void print_matriz(char M[10][10], int selector){
+void print_matriz(char M[11][11], int selector){
     int i,j;
 
     if(selector){
@@ -201,7 +212,7 @@ void ordenar(int *v, int tamaño){
     }
 }
 
-void colocar_barcos(char M[10][10], int IA){
+void colocar_barcos(char M[11][11], int IA){
     int i, j,pos1,pos2, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, selector=0, barcos_colocados=0;
     char auxchar[3], res[6];
 
@@ -277,7 +288,8 @@ void colocar_barcos(char M[10][10], int IA){
                         resta2=abs(res[1]-res[4])+1;
                     }else{
                         sel=-2;
-                        if(pos2+v_tamaño[barcos_colocados]<10){
+                        j=rand()%2;
+                        if(pos2+v_tamaño[barcos_colocados]<10 && j==0){
                             for(i=pos2;i<v_tamaño[barcos_colocados]+pos2;i++){
                                 if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O'){
                                     sel=-1;
@@ -289,7 +301,7 @@ void colocar_barcos(char M[10][10], int IA){
                                 }
                                 barcos_colocados++;
                             }
-                        }else{
+                        }else if(pos1+v_tamaño[barcos_colocados]<10 && j==1){
                             for(i=pos1;i<v_tamaño[barcos_colocados]+pos1;i++){
                                 if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O'){
                                     sel=-1;
@@ -429,7 +441,6 @@ void colocar_barcos(char M[10][10], int IA){
                                 }
                             }
                             barcos_colocados++;
-                            //Sleep(500);
                         }else{
                             printf("Debe de haber al menos una casilla de distancia entre barco y barco\n\n");
                         }
@@ -444,44 +455,38 @@ void colocar_barcos(char M[10][10], int IA){
                                 printf("Este barco requiere menos casillas\n\n");
                             }
                         }
-                        //Sleep(500);
                     }
                 }else{
                     printf("Formato incorrecto\n\n");
-                    //Sleep(500);
                 }
-                Sleep(500);
+                if(IA!=1){
+                    Sleep(500);
+                }
             }while(sel==0);
         }
     }while(barcos_colocados!=5);
 }
 
-int atacar(char M[10][10], char MB[10][10], int barcos_hundidos, int IA){
+int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
     int i,aux,pos1,pos2;
     char res[3], auxchar;
 
     do{
         aux=0;
-        if(IA!=1){
-            printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
-            fflush(stdin);
-            fgets(res,3,stdin);
-            system("cls");
+        printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
+        fflush(stdin);
+        fgets(res,3,stdin);
+        system("cls");
 
-            if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
-                auxchar=res[1];
-                res[1]=res[0];
-                res[0]=auxchar;
-            }
-        }else{
-            pos1=rand()%10;
-            pos2=rand()%10;
+        if(toupper(res[1])=='A' || toupper(res[1])=='B' || toupper(res[1])=='C' || toupper(res[1])=='D' || toupper(res[1])=='E' || toupper(res[1])=='F' || toupper(res[1])=='G' || toupper(res[1])=='H' || toupper(res[1])=='I' || toupper(res[1])=='J'){
+            auxchar=res[1];
+            res[1]=res[0];
+            res[0]=auxchar;
         }
-        if(IA==1 || ((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9'))){
-            if(IA!=1){
-                pos1=res[1]-'0';
-                pos2=toupper(res[0])-65;
-            }
+        if((toupper(res[0])=='A' || toupper(res[0])=='B' || toupper(res[0])=='C' || toupper(res[0])=='D' || toupper(res[0])=='E' || toupper(res[0])=='F' || toupper(res[0])=='G' || toupper(res[0])=='H' || toupper(res[0])=='I' || toupper(res[0])=='J') && (res[1]=='0' || res[1]=='1' || res[1]=='2' || res[1]=='3' || res[1]=='4' || res[1]=='5' || res[1]=='6' || res[1]=='7' || res[1]=='8' || res[1]=='9')){
+            pos1=res[1]-'0';
+            pos2=toupper(res[0])-65;
+
             if(MB[pos1][pos2]==' '){
                 for(i=0;i<3;i++){
                     printf(".");
@@ -491,9 +496,7 @@ int atacar(char M[10][10], char MB[10][10], int barcos_hundidos, int IA){
                 Sleep(1000);
                 i=0;
                 if(M[pos1][pos2]==' '){
-                    if(IA!=1){
-                        printf("AGUA\n\n");
-                    }
+                    printf("AGUA\n\n");
                     MB[pos1][pos2]='A';
                 }else{
                     MB[pos1][pos2]='X';
@@ -535,20 +538,78 @@ int atacar(char M[10][10], char MB[10][10], int barcos_hundidos, int IA){
                         }
                     }
                     if(aux==0){
-                        if(IA!=1){
-                            printf("HUNDIDO !!!\n\n");
-                        }
+                        printf("HUNDIDO !!!\n\n");
                         barcos_hundidos++;
                     }
                 }
             }else{
-                if(IA!=1){
-                    printf("Ya has atacado esa casilla\n\n");
-                }
+                printf("Ya has atacado esa casilla\n\n");
                 aux=2;
             }
         }else{
             printf("Formato incorrecto\n\n");
+            aux=2;
+        }
+    }while(aux==2);
+
+    return barcos_hundidos;
+}
+
+int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,char pos_ant1[2],char pos_ant2[2]){
+    int i,aux,pos1,pos2;
+
+    do{
+        aux=0;
+        pos1=rand()%10;
+        pos2=rand()%10;
+
+        if(MB[pos1][pos2]==' '){
+            if(M[pos1][pos2]==' '){
+                MB[pos1][pos2]='A';
+            }else{
+                MB[pos1][pos2]='X';
+                if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
+                    while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                        i++;
+                    }
+                    i--;
+                    while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
+                        if(M[pos1][pos2-i]=='O'){
+                            aux=1;
+                        }
+                        i--;
+                    }
+                    if(aux==0){
+                        i++;
+                        while(M[pos1][pos2-i]=='X'){
+                            MB[pos1][pos2-i]='H';
+                            i++;
+                        }
+                    }
+                }else{
+                    while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                        i++;
+                    }
+                    i--;
+                    while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
+                        if(M[pos1-i][pos2]=='O'){
+                            aux=1;
+                        }
+                        i--;
+                    }
+                    if(aux==0){
+                        i++;
+                        while(M[pos1-i][pos2]=='X'){
+                            MB[pos1-i][pos2]='H';
+                            i++;
+                        }
+                    }
+                }
+                if(aux==0){
+                    barcos_hundidos++;
+                }
+            }
+        }else{
             aux=2;
         }
     }while(aux==2);
