@@ -25,7 +25,8 @@ void print_matriz(char [11][11], int);
 void ordenar(int *,int);
 void colocar_barcos(char [11][11], int);
 int atacar(char [10][10], char [11][11], int);
-int atacarIA(char [10][10], char [11][11], int, char [2], char [2]);
+int atacarIA(char [10][10], char [11][11], int, int [2], int [2]);
+int comprobar_casilla(char [10][10],char [11][11], int, int);
 
 int main(){
     char res;
@@ -82,8 +83,8 @@ void color(int k){
 }
 
 void jugarIA(int IA){
-    int i,j,hundidos1,hundidos2,turno=1;
-    char J1[10][10], J1B[11][11], J2[10][10], J2B[11][11], pos_ant1[2]={'\0','\0'}, pos_ant2[2]={'\0','\0'};
+    int i,j,hundidos1,hundidos2,turno=1,pos_inic[2]={-1,-1},pos_rec[2]={-1,-1};
+    char J1[10][10], J1B[11][11], J2[10][10], J2B[11][11];
 
     for (i=0;i<10;i++){
         for(j=0;j<10;j++){
@@ -140,7 +141,7 @@ void jugarIA(int IA){
                 hundidos1=atacar(J2,J2B,hundidos1);
                 turno++;
             }else{
-                hundidos2=atacarIA(J1,J1B,hundidos2,pos_ant1,pos_ant2);
+                hundidos2=atacarIA(J1,J1B,hundidos2,pos_inic,pos_rec);
                 turno--;
             }
         }
@@ -468,11 +469,10 @@ void colocar_barcos(char M[11][11], int IA){
 }
 
 int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
-    int i,aux,pos1,pos2;
+    int i,pos1,pos2,comprobante;
     char res[3], auxchar;
 
     do{
-        aux=0;
         printf("\nIntroduce la casilla que vas a atacar (Ejemplo: B6)\n");
         fflush(stdin);
         fgets(res,3,stdin);
@@ -487,134 +487,166 @@ int atacar(char M[10][10], char MB[11][11], int barcos_hundidos){
             pos1=res[1]-'0';
             pos2=toupper(res[0])-65;
 
-            if(MB[pos1][pos2]==' '){
-                for(i=0;i<3;i++){
-                    printf(".");
-                    Sleep(500);
-                }
-                system("cls");
-                Sleep(1000);
-                i=0;
-                if(M[pos1][pos2]==' '){
-                    printf("AGUA\n\n");
-                    MB[pos1][pos2]='A';
-                }else{
-                    MB[pos1][pos2]='X';
-                    if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
-                        while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                            i++;
-                        }
-                        i--;
-                        while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                            if(M[pos1][pos2-i]=='O'){
-                                aux=1;
-                            }
-                            i--;
-                        }
-                        if(aux==1){
-                            i++;
-                            while(M[pos1][pos2-i]=='X'){
-                                MB[pos1][pos2-i]='H';
-                                i++;
-                            }
-                        }
-                    }else{
-                        while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                            i++;
-                        }
-                        i--;
-                        while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                            if(M[pos1-i][pos2]=='O'){
-                                aux=1;
-                            }
-                            i--;
-                        }
-                        if(aux==1){
-                            i++;
-                            while(M[pos1-i][pos2]=='X'){
-                                MB[pos1-i][pos2]='H';
-                                i++;
-                            }
-                        }
-                    }
-                    if(aux==1){
-                        printf("HUNDIDO !!!\n\n");
-                        barcos_hundidos++;
-                    }
-                }
-            }else{
-                printf("Ya has atacado esa casilla\n\n");
-                aux=2;
+            comprobante=comprobar_casilla(M,MB,pos1,pos2);
+
+            system("cls");
+            for(i=0;i<3;i++){
+                printf(".");
+                Sleep(500);
+            }
+            Sleep(300);
+            system("cls");
+            switch(comprobante){
+                case 0:
+                    printf("AGUA");
+                    break;
+                case 1:
+                    printf("TOCADO");
+                    break;
+                case 2:
+                    printf("HUNDIDO !!!");
+                    barcos_hundidos++;
+                    break;
+                case 3:
+                    printf("Ya has atacado esta casilla!");
+                    break;
             }
         }else{
-            printf("Formato incorrecto\n\n");
-            aux=2;
+            printf("Formato incorrecto.");
+            comprobante=3;
         }
-    }while(aux==2);
+    }while(comprobante==3);
 
     return barcos_hundidos;
 }
 
-int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,char pos_ant1[2],char pos_ant2[2]){
-    int i,aux,pos1,pos2;
+int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,int pos_inic[2],int pos_rec[2]){
+    int i,pos1,pos2,comprobante,elec_random;
 
     do{
-        aux=0;
-        pos1=rand()%10;
-        pos2=rand()%10;
-
-        if(MB[pos1][pos2]==' '){
-            if(M[pos1][pos2]==' '){
-                MB[pos1][pos2]='A';
-            }else{
-                MB[pos1][pos2]='X';
-                if(M[pos1+1][pos2]==' ' && M[pos1-1][pos2]==' '){
-                    while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                        i++;
-                    }
-                    i--;
-                    while(M[pos1][pos2-i]=='X' || M[pos1][pos2-i]=='O'){
-                        if(M[pos1][pos2-i]=='O'){
-                            aux=1;
-                        }
-                        i--;
-                    }
-                    if(aux==1){
-                        i++;
-                        while(M[pos1][pos2-i]=='X'){
-                            MB[pos1][pos2-i]='H';
-                            i++;
-                        }
-                    }
-                }else{
-                    while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                        i++;
-                    }
-                    i--;
-                    while(M[pos1-i][pos2]=='X' || M[pos1-i][pos2]=='O'){
-                        if(M[pos1-i][pos2]=='O'){
-                            aux=1;
-                        }
-                        i--;
-                    }
-                    if(aux==1){
-                        i++;
-                        while(M[pos1-i][pos2]=='X'){
-                            MB[pos1-i][pos2]='H';
-                            i++;
-                        }
-                    }
-                }
-                if(aux==1){
-                    barcos_hundidos++;
-                }
-            }
+        if(pos_inic[0]==-1){
+            pos1=rand()%10;
+            pos2=rand()%10;
         }else{
-            aux=2;
+            do{
+                elec_random=rand()%4;
+                switch(elec_random){
+                    case 0:
+                        if((pos_rec[0]-1)!=-1 && M[pos_rec[0]][pos_rec[1]]!='X'){
+                            pos1=pos_rec[0]--;
+                            pos2=pos_rec[1];
+                        }else{
+                            elec_random=4;
+                        }
+                        break;
+                    case 1:
+                        if((pos_rec[0]+1)!=10 && M[pos_rec[0]][pos_rec[1]]!='X'){
+                            pos1=pos_rec[0]++;
+                            pos2=pos_rec[1];
+                        }else{
+                            elec_random=4;
+                        }
+                        break;
+                    case 2:
+                        if((pos_rec[1]-1)!=-1 && M[pos_rec[0]][pos_rec[1]]!='X'){
+                            pos2=pos_rec[1]--;
+                            pos1=pos_rec[0];
+                        }else{
+                            elec_random=4;
+                        }
+                        break;
+                    case 3:
+                        if((pos_rec[1]+1)!=10 && M[pos_rec[0]][pos_rec[1]]!='X'){
+                            pos2=pos_rec[1]++;
+                            pos1=pos_rec[0];
+                        }else{
+                            elec_random=4;
+                        }
+                        break;
+                }
+            }while(elec_random==4);
         }
-    }while(aux==2);
+
+        comprobante=comprobar_casilla(M,MB,pos1,pos2);
+
+        if(comprobante==1){
+            if(pos_inic[0]==-1){
+                pos_inic[0]=pos1;
+                pos_inic[1]=pos2;
+                pos_rec[0]=pos1;
+                pos_rec[1]=pos2;
+            }else{
+                pos_rec[0]=pos1;
+                pos_rec[1]=pos2;
+            }
+        }
+
+        if(comprobante==2){
+            barcos_hundidos++;
+            pos_inic[0]=-1;
+            pos_inic[1]=-1;
+            pos_rec[0]=-1;
+            pos_rec[1]=-1;
+        }
+        
+    }while(comprobante==3);
 
     return barcos_hundidos;
+}
+
+int comprobar_casilla(char M[10][10],char MB[11][11], int pos1, int pos2){
+    int i,aux=2;
+
+    if(M[pos1][pos2]==' '){
+        if(MB[pos1][pos2]==' '){
+            M[pos1][pos2]='A';
+            aux=0;
+        }else{
+            M[pos1][pos2]='X';
+            if(MB[pos1+1][pos2]==' ' && MB[pos1-1][pos2]==' '){
+                while(MB[pos1][pos2-i]=='O'){
+                    i++;
+                }
+                i--;
+                while(MB[pos1][pos2-i]=='O'){
+                    if(M[pos1][pos2-i]==' '){
+                        aux=1;
+                    }
+                    i--;
+                }
+                if(aux==2){
+                    i++;
+                    while(M[pos1][pos2-i]=='X'){
+                        M[pos1][pos2-i]='H';
+                        MB[pos1][pos2-i]='H';
+                        i++;
+                    }
+                }
+            }else{
+                while(MB[pos1-i][pos2]=='O'){
+                    i++;
+                }
+                i--;
+                while(MB[pos1-i][pos2]=='O'){
+                    if(M[pos1-i][pos2]==' '){
+                        aux=1;
+                    }
+                    i--;
+                }
+                if(aux==2){
+                    i++;
+                    while(M[pos1-i][pos2]=='X'){
+                        M[pos1-i][pos2]='H';
+                        MB[pos1-i][pos2]='H';
+                        i++;
+                    }
+                }
+            }
+        }
+    }else{
+        aux=3;
+    }
+    return aux;
 }
 
 //'O'=Barco colocado en ese lugar
