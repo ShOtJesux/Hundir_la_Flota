@@ -528,43 +528,47 @@ int atacarIA(char M[10][10],char MB[11][11],int barcos_hundidos,int pos_inic[2],
             pos1=rand()%10;
             pos2=rand()%10;
         }else{
-            do{
-                elec_random=rand()%4;
-                switch(elec_random){
-                    case 0:
-                        if((pos_rec[0]-1)!=-1 && M[pos_rec[0]][pos_rec[1]]!='X'){
-                            pos1=pos_rec[0]--;
-                            pos2=pos_rec[1];
-                        }else{
-                            elec_random=4;
-                        }
-                        break;
-                    case 1:
-                        if((pos_rec[0]+1)!=10 && M[pos_rec[0]][pos_rec[1]]!='X'){
-                            pos1=pos_rec[0]++;
-                            pos2=pos_rec[1];
-                        }else{
-                            elec_random=4;
-                        }
-                        break;
-                    case 2:
-                        if((pos_rec[1]-1)!=-1 && M[pos_rec[0]][pos_rec[1]]!='X'){
-                            pos2=pos_rec[1]--;
-                            pos1=pos_rec[0];
-                        }else{
-                            elec_random=4;
-                        }
-                        break;
-                    case 3:
-                        if((pos_rec[1]+1)!=10 && M[pos_rec[0]][pos_rec[1]]!='X'){
-                            pos2=pos_rec[1]++;
-                            pos1=pos_rec[0];
-                        }else{
-                            elec_random=4;
-                        }
-                        break;
-                }
-            }while(elec_random==4);
+            if(pos_inic[0]==pos_rec[0] && pos_inic[1]==pos_rec[1]){
+                do{
+                    elec_random=rand()%4;
+                    switch(elec_random){
+                        case 0:
+                            if((pos_rec[0]-1)!=-1 && M[pos_rec[0]-1][pos_rec[1]]!='X' && M[pos_rec[0]-1][pos_rec[1]]!='H' && M[pos_rec[0]-1][pos_rec[1]]!='A'){
+                                pos1=pos_rec[0]--;
+                                pos2=pos_rec[1];
+                            }else{
+                                elec_random=4;
+                            }
+                            break;
+                        case 1:
+                            if((pos_rec[0]+1)!=10 && M[pos_rec[0]+1][pos_rec[1]]!='X' && M[pos_rec[0]+1][pos_rec[1]]!='H' && M[pos_rec[0]+1][pos_rec[1]]!='A'){
+                                pos1=pos_rec[0]++;
+                                pos2=pos_rec[1];
+                            }else{
+                                elec_random=4;
+                            }
+                            break;
+                        case 2:
+                            if((pos_rec[1]-1)!=-1 && M[pos_rec[0]][pos_rec[1]-1]!='X' && M[pos_rec[0]][pos_rec[1]-1]!='H' && M[pos_rec[0]][pos_rec[1]-1]!='A'){
+                                pos2=pos_rec[1]--;
+                                pos1=pos_rec[0];
+                            }else{
+                                elec_random=4;
+                            }
+                            break;
+                        case 3:
+                            if((pos_rec[1]+1)!=10 && M[pos_rec[0]][pos_rec[1]-1]!='X' && M[pos_rec[0]][pos_rec[1]-1]!='H' && M[pos_rec[0]][pos_rec[1]-1]!='A'){
+                                pos2=pos_rec[1]++;
+                                pos1=pos_rec[0];
+                            }else{
+                                elec_random=4;
+                            }
+                            break;
+                    }
+                }while(elec_random==4);
+            }else{
+                //Esto para cuando la pos_rec sea distinta de pos_inic
+            }
         }
 
         comprobante=comprobar_casilla(M,MB,pos1,pos2);
