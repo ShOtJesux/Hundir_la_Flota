@@ -4,9 +4,15 @@
 #include <windows.h>
 #include <time.h>
 
+#define ROJO 4
 #define BLANCO 7
+#define ROJO_ROJO 68
+#define ROJO_BLANCO 71
 #define AZUL_AZUL 153
 #define AZUL_BLANCO 159
+#define VERDE_ROJO 164
+#define VERDE_BLANCO 167
+#define VERDE_VERDE 170
 
 void color(int);
 void jugarIA(int);
@@ -16,9 +22,13 @@ void colocar_barcos(char [11][11], int);
 int atacar(char [10][10], char [11][11], int);
 int atacarIA(char [10][10], char [11][11], int, int [2], int [2]);
 int comprobar_casilla(char [10][10],char [11][11], int, int);
+void color_casilla(char [11][11], int, int, int);
 
 int main(){
     char res;
+    int i=0;
+    color(i);
+    Sleep(5000000);
 
     srand(time(NULL));
 
@@ -68,7 +78,11 @@ int main(){
 
 void color(int k){
     HANDLE Consola = GetStdHandle( STD_OUTPUT_HANDLE );
-    SetConsoleTextAttribute(Consola,k);
+    for(k=0;k<500;k++){
+        SetConsoleTextAttribute(Consola,k);
+        printf("%i - hola\n",k);
+    }
+    //SetConsoleTextAttribute(Consola,k);
 }
 
 void jugarIA(int IA){
@@ -142,41 +156,31 @@ void print_matriz(char M[11][11], int selector){
     printf("     |  A  |  B  |  C  |  D  |  E  |  F  |  G  |  H  |  I  |  J  |\n");
     printf("_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|\n");
     for(i=0;i<10;i++){
-        printf("     ");
+        printf("     |");
         for(j=0;j<10;j++){
-            printf("|");///////////////////////////
-            if(M[i][j]=='.'){
-                color(AZUL_AZUL);
-            }
+            color_casilla(M,i,j,1);
             printf("     ");///// 
-            color(BLANCO);
+            color_casilla(M,i,j,0);
+            printf("|");///////////////////////////
         }
-        printf("|\n");
+        color(BLANCO);
+        printf("\n");
         printf("  %i  ",i);
         printf("|");
         for(j=0;j<10;j++){
-            if(M[i][j]=='x'){
-                color();
-            }
-            if(M[i][j]=='X'){
-                color();
-            }
-            if(M[i][j]=='A'){
-                color(AZUL_AZUL);
-            }
+            color_casilla(M,i,j,1);
             printf("  %c  ",M[i][j]);/////
-            color(BLANCO);
+            color_casilla(M,i,j,0);
             printf("|");/////////////////////////
         }
+        color(BLANCO);
         printf("\n");
-        printf("_____");
+        printf("_____|");
         for(j=0;j<10;j++){
-            color(BLANCO);
-            printf("|");/////////////////////////////////
-            if(M[i][j]=='.'){
-                color(AZUL_BLANCO);
-            }
+            color_casilla(M,i,j,1);
             printf("_____");/////
+            color_casilla(M,i,j,0);
+            printf("|");/////////////////////////////////
         }
         color(BLANCO);
         printf("|\n");
@@ -670,22 +674,48 @@ int comprobar_casilla(char M[10][10],char MB[11][11], int pos1, int pos2){
     }
 }
 
+void color_casilla(char M[11][11], int i, int k, int selector){
+    if(selector==0){
+
+    }else{
+        switch(M[i][j]){
+            case 'O':
+                color(VERDE_VERDE);
+                break;
+            case 'X':
+                color(VERDE_ROJO);
+                break;
+            case 'H':
+                color(ROJO_ROJO);
+                break;
+            case ' ':
+                color(BLANCO);
+                break;
+            case 'A':
+                color(AZUL_AZUL);
+                break;
+            case 'x':
+                color(ROJO);
+                break;
+        }
+    }
+}
+
 
 //MATRIZ DE BARCOS                      COLOR=FONDO_LETRA
 
-//'O'=Barco colocado en ese lugar       COLOR=VERDE_VERDE
-//'X'=Barco tocado                      COLOR=VERDE_ROJO
-//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO
-//' '=Casilla libre                     COLOR=BLANCO
+//'O'=Barco colocado en ese lugar       COLOR=VERDE_VERDE   
+//'X'=Barco tocado                      COLOR=VERDE_ROJO    
+//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO     
+//' '=Casilla libre                     COLOR=BLANCO        
 
 
 //MATRIZ DE ATACAR
 
-//'A'=Agua                              COLOR=AZUL_AZUL
-//'x'=Barco tocado                      COLOR=BLANCO_ROJO
-
-//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO
-//' '=Casilla libre                     COLOR=BLANCO
+//'A'=Agua                              COLOR=AZUL_AZUL     
+//'x'=Barco tocado                      COLOR=ROJO
+//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO     
+//' '=Casilla libre                     COLOR=BLANCO        
 
 
 //VARIANTES: PARA LA CONTINUIDAD DE BARCOS: ROJO_BLANCO, VERDE_BLANCO, AZUL_BLANCO
