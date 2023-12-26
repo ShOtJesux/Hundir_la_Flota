@@ -17,7 +17,7 @@
 #define VERDE_VERDE 34 //170
 
 void color(int);
-void jugarIA(int);
+void jugarIA(int,int,int,int,char *,char *);
 void print_matriz(char [11][11], int);
 void ordenar(int *,int);
 void colocar_barcos(char [11][11], int);
@@ -30,10 +30,7 @@ void ajustes(int *,int *,int *,char *,char *);
 
 int main(){
     int AA=1,CT=0,PN=0;
-    char res[3],res_sing,*nombre1,*nombre2;
-
-    nombre1=(char *)malloc(10*sizeof(char));
-    nombre2=(char *)malloc(10*sizeof(char));
+    char res[3],res_sing,nombre1[70],nombre2[70];
 
     strcpy(nombre1,"Jugador 1");
     strcpy(nombre2,"Jugador 2");
@@ -67,12 +64,11 @@ int main(){
 
         switch(res_sing){
             case '1':
-                nombre2=(char *)realloc(nombre2,6*sizeof(char));
                 strcpy(nombre2,"La IA");
-                jugarIA(1);
+                jugarIA(1,AA,CT,PN,nombre1,nombre2);
                 break;
             case '2':
-                jugarIA(0);
+                jugarIA(0,AA,CT,PN,nombre1,nombre2);
                 break;
             case '3':
                 ajustes(&AA,&CT,&PN,nombre1,nombre2);
@@ -103,7 +99,7 @@ void color(int k){
 }
 
 void ajustes(int *AA,int *CT,int *PN,char *nombre1,char *nombre2){
-    int i,aux;
+    int longitud;
     char res[3],res_sing,nombre_aux[70];
 
     do{
@@ -162,36 +158,31 @@ void ajustes(int *AA,int *CT,int *PN,char *nombre1,char *nombre2){
                     fgets(res,3,stdin);
                     system("cls");
                     if(res[1]=='\n' && (res[0]=='1' || res[0]=='2')){
-                        printf("%cC%cmo te llamas, Jugador %c?: ",168,162,res[0]);
-                        fflush(stdin);
-                        fgets(nombre_aux,70,stdin);
-                        system("cls");
-                        i=0;
-                        if(res[0]=='1'){//Metodo para quitar \n no funciona???
-                            while(nombre_aux[i]!='\n'){
-                                i++;
+                        do{
+                            printf("%cC%cmo te llamas, Jugador %c?: ",168,162,res[0]);
+                            nombre_aux[0]='\0';
+                            fflush(stdin);
+                            fgets(nombre_aux,70,stdin);
+                            longitud=strlen(nombre_aux);
+                            nombre_aux[longitud-1]='\0';
+                            system("cls");
+                            if((res[0]=='1' && strcasecmp(nombre2,nombre_aux)!=0) || (res[0]=='2' && strcasecmp(nombre1,nombre_aux)!=0)){//Comprobar los nombres de los jugadores son iguales
+                                if(res[0]=='1'){
+                                    nombre1[0]='\0';
+                                    strcpy(nombre1,nombre_aux);
+                                }else{
+                                    nombre2[0]='\0';
+                                    strcpy(nombre2,nombre_aux);
+                                }
+                                printf("Cambio efectuado.");
+                                Sleep(1000);
+                                system("cls");
+                            }else{
+                                system("cls");
+                                printf("Ambos jugadores no pueden tener el mismo nombre\n\n");
+                                Sleep(500);
                             }
-                            nombre1[i]='\0';
-                            printf("hola - %s",nombre1);
-                            Sleep(1000);
-                            printf("hola - %s",nombre_aux);
-                            Sleep(1000);
-                            nombre1=(char *)realloc(nombre1,(i+1)*sizeof(char));
-                            aux=i;
-                            for(i=0;i<aux;i++){
-                                nombre1[i]=nombre_aux[i];
-                            }
-                        }else{
-                            while(nombre_aux[i]!='\n'){
-                                nombre2[i]=nombre_aux[i];
-                                i++;
-                            }
-                            nombre2[i]='\0';
-                            nombre2=(char *)realloc(nombre2,i*sizeof(char));
-                        }
-                        printf("Cambio efectuado.");
-                        Sleep(1000);
-                        system("cls");
+                        }while((res[0]=='1' && strcasecmp(nombre2,nombre_aux)==0) || (res[0]=='2' && strcasecmp(nombre1,nombre_aux)==0));
                     }else{
                         if(res[0]!='3'){
                             system("cls");
@@ -287,7 +278,7 @@ void ajustes(int *AA,int *CT,int *PN,char *nombre1,char *nombre2){
     }while(res_sing!='5');
 }
 
-void jugarIA(int IA){
+void jugarIA(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
     int i,j,hundidos1,hundidos2,turno=1,pos_inic[2]={-1,-1},pos_rec[2]={-1,-1},aux=0;
     char J1[11][11], J1B[11][11], J2[11][11], J2B[11][11];
 
@@ -309,15 +300,15 @@ void jugarIA(int IA){
     //colocar_barcos(J2B,IA);
     //print_matriz(J2B,0);
     //Sleep(10000);
-        
+
     if(IA!=1){
-        printf("TURNO DEL JUGADOR 1\n\n");
+        printf("TURNO DE %s\n\n",nombre1);
         Sleep(800);
     }
-    //colocar_barcos(J1B,0);
-    
+    colocar_barcos(J1B,0);
+
     if(IA!=1){
-        printf("TURNO DEL JUGADOR 2\n\n");
+        printf("TURNO DE %s\n\n",nombre2);
         Sleep(800);
     }
     colocar_barcos(J2B,IA);
@@ -330,8 +321,12 @@ void jugarIA(int IA){
     Sleep(1000);
 
     do{
-        if(IA!=1){
-            printf("TURNO DEL JUGADOR %i\n\n",turno);
+        if(IA!=1 && turno==1){
+            printf("TURNO DE %s\n\n",nombre1);
+            Sleep(500);
+        }
+        if(IA!=1 && turno==2){
+            printf("TURNO DE %s\n\n",nombre2);
             Sleep(500);
         }
 
@@ -355,9 +350,15 @@ void jugarIA(int IA){
 
     }while(hundidos1!=5 && hundidos2!=5);
 
+    system("cls");//////////////////////////
+
     if(hundidos1==5){
-        /////////////////////////////////////
+        printf("%c VICTORIA DE %s !\n\n",173,nombre1);
+    }else{
+        printf("%c VICTORIA DE %s !\n\n",173,nombre2);
     }
+//escribir una tablita que sea: Nombre jugador arriba, abajo de eso "Barcos hundidos", y abajo de eso, el numero de barcos hundidos. separar ambas columnas con guiones
+    printf("")
 }
 
 void print_matriz(char M[11][11], int selector){
@@ -621,8 +622,8 @@ void colocar_barcos(char M[11][11], int IA){
                             if(sel!=-1){
                                 for(j=i;j<resta1+i;j++){
                                     M[res[1]-'0'][j]='O';
-                                }  
-                            }       
+                                }
+                            }
                         }else{
                             switch(res[1]){
                                 case '0':
@@ -700,7 +701,7 @@ void colocar_barcos(char M[11][11], int IA){
                         }else{
                             printf("Debe de haber al menos una casilla de distancia entre barco y barco\n\n");
                         }
-                        
+
                     }else{
                         if(IA!=1){
                             if(resta1!=1 && resta2!=1){
@@ -895,7 +896,7 @@ int atacarIA(char M[11][11],char MB[11][11], char M_usuario[11][11], int barcos_
         }
 
         comprobante=comprobar_casilla(M,MB,pos1,pos2);
-        
+
     }while(comprobante==3);
 
     //system("cls");
@@ -913,7 +914,7 @@ int atacarIA(char M[11][11],char MB[11][11], char M_usuario[11][11], int barcos_
     Sleep(700);
 
     printf(" La IA atac%c la casilla ",162);
-    
+
     print_matriz(MB,1);
 
     gotoxy(107,36);
@@ -1061,24 +1062,24 @@ void color_casilla(char M[11][11], int i, int j, int selector){
             }
             break;
     }
-    
+
 }
 
 
 //MATRIZ DE BARCOS                      COLOR=FONDO_LETRA
 
-//'O'=Barco colocado en ese lugar       COLOR=VERDE_VERDE   
-//'X'=Barco tocado                      COLOR=VERDE_ROJO    
-//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO     
-//' '=Casilla libre                     COLOR=BLANCO        
+//'O'=Barco colocado en ese lugar       COLOR=VERDE_VERDE
+//'X'=Barco tocado                      COLOR=VERDE_ROJO
+//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO
+//' '=Casilla libre                     COLOR=BLANCO
 
 
 //MATRIZ DE ATACAR
 
-//'A'=Agua                              COLOR=AZUL_AZUL     
+//'A'=Agua                              COLOR=AZUL_AZUL
 //'x'=Barco tocado                      COLOR=ROJO
-//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO     
-//' '=Casilla libre                     COLOR=BLANCO        
+//'H'=Barco totalmente hundido          COLOR=ROJO_ROJO
+//' '=Casilla libre                     COLOR=BLANCO
 
 
 //VARIANTES: PARA LA CONTINUIDAD DE BARCOS: ROJO_BLANCO, VERDE_BLANCO, AZUL_BLANCO
