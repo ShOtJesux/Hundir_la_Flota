@@ -18,11 +18,11 @@
 #define AZUL_BLANCO 159
 
 void color(int);
-void jugarIA(int,int,int,int,char *,char *);
+void jugar(int,int,int,int,char *,char *);
 void print_matriz(char [11][11], int);
 void ordenar(int *,int);
 void colocar_barcos(char [11][11], int);
-int atacar(char [11][11], char [11][11], char [11][11], char [11][11], int, int, int, int, int, int);
+int atacar(char [11][11], char [11][11], char [11][11], char [11][11], int, int, int, int, int, int, char *);
 int atacarIA(char [11][11], char [11][11], int, int [2], int [2]);
 int comprobar_casilla(char [11][11],char [11][11], int, int, int, int);
 void color_casilla(char [11][11], int, int, int);
@@ -66,10 +66,10 @@ int main(){
         switch(res_sing){
             case '1':
                 strcpy(nombre2,"La IA");
-                jugarIA(1,AA,CT,PN,nombre1,nombre2);
+                jugar(1,AA,CT,PN,nombre1,nombre2);
                 break;
             case '2':
-                jugarIA(0,AA,CT,PN,nombre1,nombre2);
+                jugar(0,AA,CT,PN,nombre1,nombre2);
                 break;
             case '3':
                 ajustes(&AA,&CT,&PN,nombre1,nombre2);
@@ -279,12 +279,12 @@ void ajustes(int *AA,int *CT,int *PN,char *nombre1,char *nombre2){
     }while(res_sing!='5');
 }
 
-void jugarIA(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
+void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
     int i,j,hundidos1,hundidos2,turno=1,pos_inic[2]={-1,-1},pos_rec[2]={-1,-1};
-    char J1[11][11], J1B[11][11], J2[11][11], J2B[11][11],tecla;
+    char J1[11][11], J1B[11][11], J2[11][11], J2B[11][11];
 
-    for (i=0;i<11;i++){
-        for(j=0;j<11;j++){
+    for (i=0;i<10;i++){
+        for(j=0;j<10;j++){
             J1[i][j]=' ';
             J2[i][j]=' ';
             J1B[i][j]=' ';
@@ -292,13 +292,11 @@ void jugarIA(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
         }
     }
 
-    do{
-        system("cls");
-        printf("Active el modo pantalla completa\n\n");
-        printf("Pulsa Enter para continuar... ");
-        fflush(stdin);
-        tecla=getchar();
-    }while(tecla!='\n');
+    system("cls");
+    printf("Active el modo pantalla completa\n\n");
+    printf("Pulsa Enter para continuar... ");
+    fflush(stdin);
+    getchar();
 
     system("cls");
 
@@ -358,7 +356,7 @@ void jugarIA(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
                 color(BLANCO);
                 Sleep(800);
             }
-            hundidos1=atacar(J2,J2B,J1,J1B,hundidos1,turno,IA,AA,CT,PN);
+            hundidos1=atacar(J2,J2B,J1,J1B,hundidos1,turno,IA,AA,CT,PN,nombre1);
             turno++;
         }else{
             if(IA!=1){
@@ -368,7 +366,7 @@ void jugarIA(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
                 printf("%s\n\n",nombre2);
                 color(BLANCO);
                 Sleep(800);
-                hundidos2=atacar(J1,J1B,J2,J2B,hundidos2,turno,IA,AA,CT,PN);
+                hundidos2=atacar(J1,J1B,J2,J2B,hundidos2,turno,IA,AA,CT,PN,nombre2);
             }else{
                 hundidos2=atacarIA(J1,J1B,hundidos2,pos_inic,pos_rec);
             }
@@ -416,11 +414,7 @@ void print_matriz(char M[11][11], int selector){
         for(j=0;j<10;j++){
             color_casilla(M,i,j,0);
             printf("     ");
-            if(j!=9){
-                color_casilla(M,i,j,1);
-            }else{
-                color(BLANCO);
-            }
+            color_casilla(M,i,j,1);
             printf("|");
         }
         color(BLANCO);
@@ -429,16 +423,11 @@ void print_matriz(char M[11][11], int selector){
             gotoxy(x,y);
             y++;
         }
-        printf("  %i  ",i);
-        printf("|");
+        printf("  %i  |",i);
         for(j=0;j<10;j++){
             color_casilla(M,i,j,0);
             printf("  %c  ",toupper(M[i][j]));
-            if(j!=9){
-                color_casilla(M,i,j,1);
-            }else{
-                color(BLANCO);
-            }
+            color_casilla(M,i,j,1);
             printf("|");
         }
         color(BLANCO);
@@ -451,11 +440,7 @@ void print_matriz(char M[11][11], int selector){
         for(j=0;j<10;j++){
             color_casilla(M,i,j,2);
             printf("_____");
-            if(j!=9){
-                color_casilla(M,i,j,1);
-            }else{
-                color(BLANCO);
-            }
+            color_casilla(M,i,j,1);
             printf("|");
         }
         color(BLANCO);
@@ -688,7 +673,7 @@ void colocar_barcos(char M[11][11], int IA){
     }while(barcos_colocados!=5);
 }
 
-int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propia[11][11], int barcos_hundidos, int turno, int IA, int AA, int CT, int PN){
+int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propia[11][11], int barcos_hundidos, int turno, int IA, int AA, int CT, int PN, char *nombre){
     int i,j,pos1,pos2,comprobante=0;
     char res[4], auxchar;
     static int aux=2;
@@ -697,7 +682,7 @@ int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propi
             aux=0;
         }
         gotoxy(0,37+aux);
-        printf("Introduce la casilla que vas a atacar (Ejemplo: B6)\n");
+        printf("Introduce la casilla que vas a atacar (Ejemplo: %c%i)\n",rand()%10+65,rand()%10);
         fflush(stdin);
         fgets(res,4,stdin);
         system("cls");
@@ -756,20 +741,28 @@ int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propi
                     barcos_hundidos++;
                     break;
                 case 3:
-                    printf("Ya has atacado esta casilla!\n\n");
+                    printf("Ya has atacado esta casilla!");
                     break;
             }
             color(BLANCO);
         }else{
-            printf("Formato incorrecto.\n\n");
+            printf("Formato incorrecto.");
             comprobante=3;
         }
         Sleep(500);
         if(comprobante==3){
             if(IA==0){
+                printf(" Sigue siendo el turno de ");
+                color(AMARILLO);
+                printf("%s\n\n",nombre);
+                color(BLANCO);
+                Sleep(500);
+                
                 print_matriz(M_propia,0);
                 print_matriz(M,1);
             }else{
+                printf("\n\n");
+
                 print_matriz(M,0);
                 print_matriz(MB_propia,1);
             }
@@ -899,7 +892,15 @@ int atacarIA(char M[11][11],char MB[11][11], int barcos_hundidos,int pos_inic[2]
 
     printf(" La IA atac%c la casilla ",162);
 
+    if(MB[pos1][pos2]!='X' && MB[pos1][pos2]!='H'){
+        MB[pos1][pos2]='R';
+    }
+
     print_matriz(MB,1);
+
+    if(MB[pos1][pos2]!='X' && MB[pos1][pos2]!='H'){
+        MB[pos1][pos2]=' ';
+    }
 
     gotoxy(107,36);
 
@@ -1039,12 +1040,16 @@ void color_casilla(char M[11][11], int i, int j, int selector){
                 case 'x':
                     color(ROJO);
                     break;
+                case 'R':
+                    color(AMARILLO);
+                    break;
             }
             break;
         case 1:
-            if((M[i][j]=='O' || M[i][j]=='X' || M[i][j]=='H' || M[i][j]=='A') && (M[i][j+1]=='O' || M[i][j+1]=='X' || M[i][j+1]=='H' || M[i][j+1]=='A')){
-                switch(M[i][j]){
-                    case 'O' || 'X':
+            if(j!=9 && (M[i][j]==M[i][j+1] || ((M[i][j]=='X' && M[i][j+1]=='O') || (M[i][j]=='O' && M[i][j+1]=='X')))){
+                switch(M[i][j+1]){
+                    case 'O':
+                    case 'X':
                         color(VERDE_BLANCO);
                         break;
                     case 'H':
@@ -1053,19 +1058,22 @@ void color_casilla(char M[11][11], int i, int j, int selector){
                     case 'A':
                         color(AZUL_BLANCO);
                         break;
+                    case 'R':
+                    case ' ':
+                    case 'x':
+                        color(BLANCO);
+                        break;
                 }
             }else{
                 color(BLANCO);
-            }
-            if(((M[i][j]==' ' || M[i][j]=='A') && (M[i][j+1]!=' ' && M[i][j+1]!='A')) || ((M[i][j]!=' ' && M[i][j]!='A') && (M[i][j+1]==' ' || M[i][j+1]=='A'))){
-                color(BLANCO);
+                if((M[i][j]=='A' && (M[i][j+1]=='O' || M[i][j+1]=='X' || M[i][j+1]=='H')) || ((M[i][j]=='O' || M[i][j]=='X' || M[i][j]=='H') && M[i][j+1]=='A')){
+                    color(AZUL_BLANCO);
+                }
             }
             break;
         case 2:
             switch(M[i][j]){
                 case 'O':
-                    color(VERDE_BLANCO);
-                    break;
                 case 'X':
                     color(VERDE_BLANCO);
                     break;
@@ -1075,10 +1083,14 @@ void color_casilla(char M[11][11], int i, int j, int selector){
                 case 'A':
                     color(AZUL_BLANCO);
                     break;
+                case 'R':
+                case ' ':
+                case 'x':
+                    color(BLANCO);
+                    break;
             }
             break;
     }
-
 }
 
 
