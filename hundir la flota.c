@@ -557,7 +557,7 @@ void colocar_barcos(char M[11][11], int IA){
                         j=rand()%2;
                         if(pos2+v_tamaño[barcos_colocados]<10 && j==0){
                             for(i=pos2;i<v_tamaño[barcos_colocados]+pos2;i++){
-                                if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O'){
+                                if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O' || M[i][pos1]!=' '){
                                     sel=-1;
                                 }
                             }
@@ -569,7 +569,7 @@ void colocar_barcos(char M[11][11], int IA){
                             }
                         }else if(pos1+v_tamaño[barcos_colocados]<10 && j==1){
                             for(i=pos1;i<v_tamaño[barcos_colocados]+pos1;i++){
-                                if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O'){
+                                if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O' || M[pos2][i]!=' '){
                                     sel=-1;
                                 }
                             }
