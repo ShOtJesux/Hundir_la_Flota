@@ -19,13 +19,13 @@
 
 void color(int);
 void jugar(int,int,int,int,char *,char *);
-void print_matriz(char [11][11], int);
+void print_matriz(char [10][11], int);
 void ordenar(int *,int);
-void colocar_barcos(char [11][11], int);
-int atacar(char [11][11], char [11][11], char [11][11], char [11][11], int, int, int, int, int, int, char *);
-int atacarIA(char [11][11], char [11][11], int, int [2], int [2]);
-int comprobar_casilla(char [11][11],char [11][11], int, int, int, int);
-void color_casilla(char [11][11], int, int, int);
+void colocar_barcos(char [10][11], int);
+int atacar(char [10][11], char [10][11], char [10][11], char [10][11], int, int, int, int, int, int, char *);
+int atacarIA(char [10][11], char [10][11], int, int [2], int [2]);
+int comprobar_casilla(char [10][11],char [10][11], int, int, int, int);
+void color_casilla(char [10][11], int, int, int);
 void gotoxy(int,int);
 void ajustes(int *,int *,int *,char *,char *);
 
@@ -281,7 +281,7 @@ void ajustes(int *AA,int *CT,int *PN,char *nombre1,char *nombre2){
 
 void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
     int i,j,hundidos1,hundidos2,turno=1,pos_inic[2]={-1,-1},pos_rec[2]={-1,-1};
-    char J1[11][11], J1B[11][11], J2[11][11], J2B[11][11];
+    char J1[10][11], J1B[10][11], J2[10][11], J2B[10][11];
 
     for (i=0;i<10;i++){
         for(j=0;j<10;j++){
@@ -312,7 +312,7 @@ void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
         color(BLANCO);
         Sleep(800);
     }
-    colocar_barcos(J1B,0);
+    //colocar_barcos(J1B,0);
 
     if(IA!=1){
         printf("TURNO DE ");
@@ -321,7 +321,7 @@ void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
         color(BLANCO);
         Sleep(800);
     }
-    colocar_barcos(J2B,IA);
+    //colocar_barcos(J2B,IA);
 
     system("cls");
 
@@ -385,7 +385,7 @@ void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
     //escribir una tablita que sea: Nombre jugador arriba, abajo de eso "Barcos hundidos", y abajo de eso, el numero de barcos hundidos. separar ambas columnas con guiones
 }
 
-void print_matriz(char M[11][11], int selector){
+void print_matriz(char M[10][11], int selector){
     int i,j,x,y;
 
     if(selector!=0){
@@ -478,7 +478,7 @@ void ordenar(int *v, int tamaño){
     }
 }
 
-void colocar_barcos(char M[11][11], int IA){
+void colocar_barcos(char M[10][11], int IA){
     int i, j,pos1,pos2, resta1, resta2, sel=0, *v, v_tamaño[5]={5,4,3,3,2}, barcos_colocados=0;
     char auxchar[3], res[7];
 
@@ -557,7 +557,7 @@ void colocar_barcos(char M[11][11], int IA){
                         j=rand()%2;
                         if(pos2+v_tamaño[barcos_colocados]<10 && j==0){
                             for(i=pos2;i<v_tamaño[barcos_colocados]+pos2;i++){
-                                if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O' || M[i][pos1]!=' '){
+                                if(M[i-1][pos1]=='O' || M[i+1][pos1]=='O' || M[i][pos1-1]=='O' || M[i][pos1+1]=='O'){
                                     sel=-1;
                                 }
                             }
@@ -569,7 +569,7 @@ void colocar_barcos(char M[11][11], int IA){
                             }
                         }else if(pos1+v_tamaño[barcos_colocados]<10 && j==1){
                             for(i=pos1;i<v_tamaño[barcos_colocados]+pos1;i++){
-                                if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O' || M[pos2][i]!=' '){
+                                if(M[pos2][i-1]=='O' || M[pos2][i+1]=='O' || M[pos2-1][i]=='O' || M[pos2+1][i]=='O'){
                                     sel=-1;
                                 }
                             }
@@ -673,7 +673,7 @@ void colocar_barcos(char M[11][11], int IA){
     }while(barcos_colocados!=5);
 }
 
-int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propia[11][11], int barcos_hundidos, int turno, int IA, int AA, int CT, int PN, char *nombre){
+int atacar(char M[10][11], char MB[10][11], char M_propia[10][11], char MB_propia[10][11], int barcos_hundidos, int turno, int IA, int AA, int CT, int PN, char *nombre){
     int i,j,pos1,pos2,comprobante=0;
     char res[4], auxchar;
     static int aux=2;
@@ -758,8 +758,13 @@ int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propi
                 color(BLANCO);
                 Sleep(500);
                 
-                print_matriz(M_propia,0);
-                print_matriz(M,1);
+                if(turno==1){
+                    print_matriz(M,0);
+                    print_matriz(M_propia,1);
+                }else{
+                    print_matriz(M_propia,0);
+                    print_matriz(M,1);
+                }
             }else{
                 printf("\n\n");
 
@@ -788,7 +793,7 @@ int atacar(char M[11][11], char MB[11][11], char M_propia[11][11], char MB_propi
     return barcos_hundidos;
 }
 
-int atacarIA(char M[11][11],char MB[11][11], int barcos_hundidos,int pos_inic[2],int pos_rec[2]){
+int atacarIA(char M[10][11],char MB[10][11], int barcos_hundidos,int pos_inic[2],int pos_rec[2]){
     int i,pos1,pos2,comprobante,elec_random,resta1,resta2;
 
     do{
@@ -935,7 +940,7 @@ int atacarIA(char M[11][11],char MB[11][11], int barcos_hundidos,int pos_inic[2]
     return barcos_hundidos;
 }
 
-int comprobar_casilla(char M[11][11],char MB[11][11], int pos1, int pos2, int AA, int CT){
+int comprobar_casilla(char M[10][11],char MB[10][11], int pos1, int pos2, int AA, int CT){
     int i=0;
     if(M[pos1][pos2]==' '){
         if(MB[pos1][pos2]==' '){
@@ -1018,7 +1023,7 @@ int comprobar_casilla(char M[11][11],char MB[11][11], int pos1, int pos2, int AA
     }
 }
 
-void color_casilla(char M[11][11], int i, int j, int selector){
+void color_casilla(char M[10][11], int i, int j, int selector){
     switch(selector){
         case 0:
             switch(M[i][j]){
