@@ -312,7 +312,7 @@ void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
         color(BLANCO);
         Sleep(800);
     }
-    //colocar_barcos(J1B,0);
+    colocar_barcos(J1B,0);
 
     if(IA!=1){
         printf("TURNO DE ");
@@ -321,7 +321,7 @@ void jugar(int IA,int AA,int CT,int PN,char *nombre1,char *nombre2){
         color(BLANCO);
         Sleep(800);
     }
-    //colocar_barcos(J2B,IA);
+    colocar_barcos(J2B,IA);
 
     system("cls");
 
@@ -525,7 +525,7 @@ void colocar_barcos(char M[10][11], int IA){
                 pos2=rand()%10;
             }while(pos1+v_tamaño[barcos_colocados]>=10 && pos2+v_tamaño[barcos_colocados]>=10);
         }
-        if(IA!=1 && (sel<=0 || sel>=i) && auxchar[1]!='\n'){
+        if(IA!=1 && (sel<1 || sel>i-1 || auxchar[1]!='\n')){
             system("cls");
             printf("Opci%cn incorrecta\n\n",162);
             sel=0;
